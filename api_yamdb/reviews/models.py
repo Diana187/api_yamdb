@@ -3,7 +3,15 @@ from django.db import models
 
 
 class Title(models.Model):
-    pass
+    name = models.CharField('Наименование произведения', max_length=200)
+    year = models.IntegerField('Год создания произведения')
+    category = models.ForeignKey(
+        'Category',
+        verbose_name='категория',
+        on_delete=models.CASCADE,
+        related_name='categories',
+        help_text='название категории',
+    )
 
 
 class Review(models.Model):
@@ -97,3 +105,27 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:settings.FIRST_SYMBOLS]
+
+
+class GenreTitle(models.Model):
+    genre = models.ForeignKey(
+        Genre,
+        verbose_name='жанр',
+        on_delete=models.CASCADE,
+        related_name='genres',
+        help_text='наименование жанра',
+    )
+    title = models.ForeignKey(
+        Title,
+        verbose_name='произведение',
+        on_delete=models.CASCADE,
+        related_name='titles',
+        help_text='наименование произведения',
+    )
+
+    class Meta:
+        verbose_name = 'Жанры-Произведения'
+        verbose_name_plural = 'Жанры-Произведения'
+
+    def __str__(self):
+        return f'{self.genre}->{self.title}'

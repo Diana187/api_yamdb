@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Reviews, Title, Category, Genre
+from .models import Review, Title, Category, Genre, GenreTitle
 
 # ------------------------------------образец класса для отображения в админке
 # class ReviewsAdmin(admin.ModelAdmin):
@@ -17,7 +17,8 @@ from .models import Reviews, Title, Category, Genre
 #     empty_value_display = '-пусто-'
 
 
-admin.site.register(Reviews)
+admin.site.register(Review)
 admin.site.register(Title)
 admin.site.register(Category)
 admin.site.register(Genre)
+admin.site.register(GenreTitle)
