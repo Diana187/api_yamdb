@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework import routers
 from rest_framework.authtoken import views
 
-from api.views import CategoryViewSet
+from .views import CategoryViewSet
 
 router = routers.DefaultRouter()
 router.register('categories', CategoryViewSet)
