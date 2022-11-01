@@ -4,14 +4,22 @@ from django.db import models
 
 class Title(models.Model):
     name = models.CharField('Наименование произведения', max_length=200)
-    year = models.IntegerField('Год создания произведения')
+    year = models.CharField('Год создания произведения', max_length=4)
     category = models.ForeignKey(
         'Category',
         verbose_name='категория',
         on_delete=models.CASCADE,
-        related_name='categories',
+        related_name='titles',
         help_text='название категории',
     )
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
+        ordering = ('-name',)
+
+    def __str__(self):
+        return self.name
 
 
 class Review(models.Model):
@@ -19,7 +27,7 @@ class Review(models.Model):
         Title,
         verbose_name='Произведение',
         on_delete=models.CASCADE,
-        related_name='titles',
+        related_name='reviews',
         help_text='название произведения',
     )
     text = models.TextField(
@@ -51,7 +59,7 @@ class Review(models.Model):
 
 class Category(models.Model):
     name = models.CharField('Категория', max_length=50)
-    slug = models.SlugField('Слаг', default='категория не выбрана')
+    slug = models.SlugField('Слаг', default='слаг не указан')
 
     class Meta:
         verbose_name = 'Категория'
@@ -64,7 +72,7 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField('Жанр', max_length=50)
-    slug = models.SlugField('Слаг', default='жанр не выбран')
+    slug = models.SlugField('Слаг', default='слаг не указан')
 
     class Meta:
         verbose_name = 'Жанр'
@@ -76,22 +84,24 @@ class Genre(models.Model):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(Review,
-                             verbose_name='Комментарии',
-                             on_delete=models.CASCADE,
-                             related_name='comments',
-                             help_text='Комментарии',
-                             )
-
-    author = models.ForeignKey(settings.AUTH_USER_MODEL,
-                               verbose_name='Автор комментария',
-                               on_delete=models.CASCADE,
-                               related_name='comments',
-                               help_text='Имя автора',
-                               )
-    text = models.TextField('Текст комментария',
-                            help_text='Введите текст комментария'
-                            )
+    review = models.ForeignKey(
+        Review,
+        verbose_name='Отзыв',
+        on_delete=models.CASCADE,
+        related_name='comments',
+        help_text='ID отзыва',
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name='Автор комментария',
+        on_delete=models.CASCADE,
+        related_name='comments',
+        help_text='ID автора',
+    )
+    text = models.TextField(
+        'Текст комментария',
+        help_text='Введите текст комментария'
+    )
     pub_date = models.DateTimeField(
         'Дата создания комментария',
         auto_now_add=True,
@@ -119,7 +129,7 @@ class GenreTitle(models.Model):
         Title,
         verbose_name='произведение',
         on_delete=models.CASCADE,
-        related_name='titles',
+        related_name='genres',
         help_text='наименование произведения',
     )
 
