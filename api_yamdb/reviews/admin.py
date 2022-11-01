@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Review, Title, Category, Genre, GenreTitle
+from .models import Review, Title, Category, Genre, GenreTitle, Comment
 
 
 class TitleAdmin(admin.ModelAdmin):
@@ -25,7 +25,7 @@ class ReviewAdmin(admin.ModelAdmin):
         'pub_date',
     )
     search_fields = ('title', 'text', 'pub_date',)
-    list_filter = ('created', 'score',)
+    list_filter = ('pub_date', 'score',)
     empty_value_display = '-пусто-'
 
 
@@ -73,8 +73,9 @@ class GenreTitleAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-admin.site.register(Review)
-admin.site.register(Title)
-admin.site.register(Category)
-admin.site.register(Genre)
-admin.site.register(GenreTitle)
+admin.site.register(Review, ReviewAdmin)
+admin.site.register(Title, TitleAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Genre, GenreAdmin)
+admin.site.register(Comment, CommentAdmin)
+admin.site.register(GenreTitle, GenreTitleAdmin)
