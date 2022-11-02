@@ -11,7 +11,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -57,7 +56,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 
-
 # Database
 
 DATABASES = {
@@ -66,7 +64,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 
@@ -85,7 +82,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 
 LANGUAGE_CODE = 'ru'
@@ -98,7 +94,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 
 STATIC_URL = '/static/'
@@ -108,3 +103,16 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 AUTH_USER_MODEL = 'users.User'
 
 FIRST_SYMBOLS = 50
+
+SCORE_CHOICES = [
+    ('1', 1),
+    ('2', 2),
+    ('3', 3),
+    ('4', 4),
+    ('5', 5),
+    ('6', 6),
+    ('7', 7),
+    ('8', 8),
+    ('9', 9),
+    ('10', 10),
+]
