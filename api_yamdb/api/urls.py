@@ -1,11 +1,11 @@
 from django.urls import include, path
 from rest_framework import routers
-from rest_framework.authtoken import views
 
-from .views import CategoryViewSet
+from .views import CategoryViewSet, TitleViewSet
 
-router = routers.DefaultRouter()
+router = routers.SimpleRouter()
 router.register('categories', CategoryViewSet)
+router.register('titles', TitleViewSet)
 
 # router.register(r'posts/(?P<post_id>\d+)/comments',
 #                 CommentViewSet,
