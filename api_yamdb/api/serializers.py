@@ -18,6 +18,7 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'year', 'category')
 
 
+
 class ReviewSerializer(serializers.ModelSerializer):
     """ Сериалайзер для модели Review."""
     author = SlugRelatedField(
@@ -25,6 +26,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault(),
     )
+
 
     class Meta:
         fields = '__all__'

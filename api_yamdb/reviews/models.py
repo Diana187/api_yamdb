@@ -44,8 +44,10 @@ class Review(models.Model):
     score = models.CharField(
         'Рейтинг',
         max_length=2,
+
         choices=settings.SCORE_CHOICES,
         null=True
+
     )
     pub_date = models.DateTimeField(
         'Дата создания отзыва',
