@@ -41,7 +41,12 @@ class Review(models.Model):
         related_name='reviews',
         help_text='Имя автора отзыва',
     )
-    score = models.IntegerField('Рейтинг')
+    score = models.CharField(
+        'Рейтинг',
+        max_length=2,
+        choices=settings.SCORE_CHOICES,
+        null=True
+    )
     pub_date = models.DateTimeField(
         'Дата создания отзыва',
         auto_now_add=True,
