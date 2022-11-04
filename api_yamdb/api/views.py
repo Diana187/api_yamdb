@@ -3,17 +3,16 @@ import csv
 
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 
-
-from .serializers import CategorySerializer, CommentSerializer, \
-    ReviewSerializer, TitleSerializer
-from reviews.models import Category, Review, Comment, Title
+from reviews.models import Category, Review, Title, Genre, Comment
+from .serializers import CategorySerializer, CommentSerializer
+from .serializers import ReviewSerializer, TitleSerializer, GenreSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -22,12 +21,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['POST'])
     def upload_data_with_validation(self, request):
-        """Upload data from CSV, with validation."""
+        """Загрузка данных из CSV с валидацией данных."""
         file = request.FILES.get("file")
-        reader = csv.DictReader(codecs.iterdecode(file, "utf-8"), delimiter=",")
+        reader = csv.DictReader(codecs.iterdecode(file, "utf-8"))
         data = list(reader)
         serializer = self.serializer_class(data=data, many=True)
         serializer.is_valid(raise_exception=True)
+
+        Category.objects.all().delete()
         category_list = []
         for row in serializer.data:
             category_list.append(
@@ -40,17 +41,41 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response("Данные успешно загружены в БД.")
 
 
-class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
+class GenresViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
 
     @action(detail=False, methods=['POST'])
     def upload_data_with_validation(self, request):
+        """Загрузка данных из CSV с валидацией."""
         file = request.FILES.get('file')
-        reader = csv.DictReader(
-            codecs.iterdecode(file, 'utf-8'),
-            delimeter=','
-        )
+        reader = csv.DictReader(codecs.iterdecode(file, "utf-8"))
+        data = list(reader)
+        serializer = self.serializer_class(data=data, many=True)
+        serializer.is_valid(raise_exception=True)
+
+        genres_list = []
+        for row in serializer.data:
+            genres_list.append(
+                Genre(
+                    name=row['name'],
+                    slug=row['slug'],
+                )
+            )
+        Genre.objects.bulk_create(genres_list)
+        return Response("Данные успешно загружены в БД.")
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    pagination_class = LimitOffsetPagination
+
+    @action(detail=False, methods=['POST'])
+    def upload_data_with_validation(self, request):
+        """Загрузка данных из CSV с валидацией."""
+        file = request.FILES.get('file')
+        reader = csv.DictReader(codecs.iterdecode(file, "utf-8"))
         data = list(reader)
         serializer = self.serializer_class(data=data, many=True)
         serializer.is_valid(raise_exception=True)
@@ -68,7 +93,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return Response("Данные успешно загружены в БД.")
 
 
-class ReviewView(UpdateModelMixin, GenericViewSet):
+class ReviewViewSet(UpdateModelMixin, GenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
@@ -82,7 +107,7 @@ class ReviewView(UpdateModelMixin, GenericViewSet):
         obj, _ = Review.score.objects.get_or_create(
             user=self.request.user,
             title_id=self.kwargs['title']
-            )
+        )
 
         return obj
 
@@ -106,4 +131,3 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
-

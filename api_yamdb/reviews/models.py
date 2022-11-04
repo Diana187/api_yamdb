@@ -2,16 +2,54 @@ from django.conf import settings
 from django.db import models
 
 
+class Category(models.Model):
+    name = models.CharField('Категория', max_length=50)
+    slug = models.SlugField('Слаг', default='слаг не указан')
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
+class Genre(models.Model):
+    name = models.CharField('Жанр', max_length=50)
+    slug = models.SlugField('Слаг', default='слаг не указан')
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
 class Title(models.Model):
     name = models.CharField('Наименование произведения', max_length=200)
     year = models.CharField('Год создания произведения', max_length=4)
     category = models.ForeignKey(
-        'Category',
+        Category,
         verbose_name='категория',
         on_delete=models.CASCADE,
         related_name='titles',
         help_text='название категории',
     )
+    genre = models.ManyToManyField(
+        Genre,
+        verbose_name='жанр',
+        help_text='наименование жанра',
+    )
+    description = models.CharField(
+        'Описание произведения',
+        max_length=250,
+        default='нет описания'
+    )
+
+    rating = models.PositiveSmallIntegerField('Рейтинг произведения')
 
     class Meta:
         verbose_name = 'Произведение'
@@ -64,32 +102,6 @@ class Review(models.Model):
         return self.text[:settings.FIRST_SYMBOLS]
 
 
-class Category(models.Model):
-    name = models.CharField('Категория', max_length=50)
-    slug = models.SlugField('Слаг', default='слаг не указан')
-
-    class Meta:
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
-        ordering = ('name',)
-
-    def __str__(self):
-        return self.name
-
-
-class Genre(models.Model):
-    name = models.CharField('Жанр', max_length=50)
-    slug = models.SlugField('Слаг', default='слаг не указан')
-
-    class Meta:
-        verbose_name = 'Жанр'
-        verbose_name_plural = 'Жанры'
-        ordering = ('name',)
-
-    def __str__(self):
-        return self.name
-
-
 class Comment(models.Model):
     review = models.ForeignKey(
         Review,
@@ -122,27 +134,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:settings.FIRST_SYMBOLS]
-
-
-class GenreTitle(models.Model):
-    genre = models.ForeignKey(
-        Genre,
-        verbose_name='жанр',
-        on_delete=models.CASCADE,
-        related_name='genres',
-        help_text='наименование жанра',
-    )
-    title = models.ForeignKey(
-        Title,
-        verbose_name='произведение',
-        on_delete=models.CASCADE,
-        related_name='genres',
-        help_text='наименование произведения',
-    )
-
-    class Meta:
-        verbose_name = 'Жанры-Произведения'
-        verbose_name_plural = 'Жанры-Произведения'
-
-    def __str__(self):
-        return f'{self.genre}->{self.title}'

@@ -104,6 +104,8 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
 AUTH_USER_MODEL = 'users.User'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 FIRST_SYMBOLS = 50
 
 SCORE_CHOICES = [
@@ -118,4 +120,3 @@ SCORE_CHOICES = [
     ('9', 9),
     ('10', 10),
 ]
-
