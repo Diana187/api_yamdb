@@ -120,3 +120,9 @@ SCORE_CHOICES = [
     ('9', 9),
     ('10', 10),
 ]
+
+USER_ROLE_CHOICES = [
+    ('user', 'user'),
+    ('moderator', 'moderator'),
+    ('admin', 'admin')
+]

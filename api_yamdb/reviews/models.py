@@ -49,7 +49,10 @@ class Title(models.Model):
         default='нет описания'
     )
 
-    rating = models.PositiveSmallIntegerField('Рейтинг произведения')
+    rating = models.PositiveSmallIntegerField(
+        'Рейтинг произведения',
+        default=0
+    )
 
     class Meta:
         verbose_name = 'Произведение'

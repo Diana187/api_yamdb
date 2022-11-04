@@ -45,52 +45,11 @@ class GenresViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
-    @action(detail=False, methods=['POST'])
-    def upload_data_with_validation(self, request):
-        """Загрузка данных из CSV с валидацией."""
-        file = request.FILES.get('file')
-        reader = csv.DictReader(codecs.iterdecode(file, "utf-8"))
-        data = list(reader)
-        serializer = self.serializer_class(data=data, many=True)
-        serializer.is_valid(raise_exception=True)
-
-        genres_list = []
-        for row in serializer.data:
-            genres_list.append(
-                Genre(
-                    name=row['name'],
-                    slug=row['slug'],
-                )
-            )
-        Genre.objects.bulk_create(genres_list)
-        return Response("Данные успешно загружены в БД.")
-
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     pagination_class = LimitOffsetPagination
-
-    @action(detail=False, methods=['POST'])
-    def upload_data_with_validation(self, request):
-        """Загрузка данных из CSV с валидацией."""
-        file = request.FILES.get('file')
-        reader = csv.DictReader(codecs.iterdecode(file, "utf-8"))
-        data = list(reader)
-        serializer = self.serializer_class(data=data, many=True)
-        serializer.is_valid(raise_exception=True)
-
-        titles_list = []
-        for row in serializer.data:
-            titles_list.append(
-                Title(
-                    name=row['name'],
-                    year=row['year'],
-                    category=row['category'],
-                )
-            )
-        Title.objects.bulk_create(titles_list)
-        return Response("Данные успешно загружены в БД.")
 
 
 class ReviewViewSet(UpdateModelMixin, GenericViewSet):
