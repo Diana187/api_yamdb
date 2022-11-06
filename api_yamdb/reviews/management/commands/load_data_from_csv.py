@@ -129,18 +129,16 @@ class Command(BaseCommand):
             Comment.objects.bulk_create(data_list)
         self.stdout.write(self.style.SUCCESS("OK"))
 
-        # file_path = 'static/data/genre_title.csv'
-        # data_list = []
-        # with open(file_path, mode="r", encoding="utf-8") as file:
-        #     reader = DictReader(file)
-        #     self.stdout.write(f"Загрузка данных из {file_path}...", ending='')
-        #     for row in reader:
-        #         data_list.append(
-        #             (row['title_id'], row['genre_id'],
-        #             )
-        #         )
-        #     Title.genre.add(data_list)
-        # self.stdout.write(self.style.SUCCESS("OK"))
+        file_path = 'static/data/genre_title.csv'
+        with open(file_path, mode="r", encoding="utf-8") as file:
+            reader = DictReader(file)
+            self.stdout.write(f"Загрузка данных из {file_path}... ", ending='')
+            for row in reader:
+                title_obj = Title.objects.get(id=row['title_id'])
+                genre = Genre.objects.get(id=row['genre_id'])
+
+                title_obj.genre.add(genre)
+        self.stdout.write(self.style.SUCCESS("OK"))
 
 
 #============================================================================
