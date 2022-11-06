@@ -1,13 +1,24 @@
 import codecs
 import csv
 
-from rest_framework import permissions
+from rest_framework import (permissions, mixins,
+                            response, viewsets)
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from api.permissions import (ObjectReadOnly, AuthorOrReadOnly,
+                             AdminOnly, AdminOrReadOnly)
 from .serializers import CategorySerializer
 from reviews.models import Category
+
+
+class ListCreateDestroyViewSet(
+        mixins.ListModelMixin,
+        mixins.CreateModelMixin,
+        mixins.DestroyModelMixin,
+        viewsets.GenericViewSet):
+    pass
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
