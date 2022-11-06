@@ -1,53 +1,54 @@
 from rest_framework import permissions
 
 
-class ObjectReadOnly(permissions.BasePermission):
+class AnonReadOnly(permissions.BasePermission):
     """Разрешены только безопасные запросы.
     Доступно без токена."""
     def has_object_permission(self, request, view, obj):
         return request.method in permissions.SAFE_METHODS
 
 
-class AuthorOrReadOnly(ObjectReadOnly):
+class AuthorOrReadOnly(permissions.BasePermission):
     """Изменять и удалять объект может
     его автор, модератор или админ."""
 
     def has_object_permission(self, request, view, obj):
-        user = request.user
-        if user.is_authenticated:
-            return user == obj.author or user.is_admin or user.is_moderator
+        if request.user.is_authenticated:
+            return (
+                request.user == obj.author
+                or request.user.is_adminor
+                or request.user.is_moderator
+            )
         return super().has_object_permission(request, view, obj)
 
 
-class AdminOnly(ObjectReadOnly):
+class AdminOnly(permissions.BasePermission):
     """Разрешает доступ к списку или объекту
     только пользователям с ролью admin.
     Также доступ имеют суперюзеры."""
 
     def has_permission(self, request, view):
-        user = request.user
-        return user.is_authenticated and user.is_admin
+        return request.user.is_authenticated and request.user.is_admin
 
     def has_object_permission(self, request, view, obj):
-        user = request.user
-        return user.is_authenticated and user.is_admin
+        return request.user.is_authenticated and request.user.is_admin
 
 
-class AdminOrReadOnly(ObjectReadOnly):
+class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
     """Разрешает доступ к списку или объекту только для чтения.
     Небезопасные запросы доступны только пользователям
     с ролью admin и суперюзерам."""
 
     def has_permission(self, request, view):
-        user = request.user
         return (
-            user.is_authenticated and user.is_admin
-            or request.method in permissions.SAFE_METHODS
+            request.method in permissions.SAFE_METHODS
+            or request.user.is_authenticated
         )
 
     def has_object_permission(self, request, view, obj):
-        user = request.user
         return (
-            user.is_authenticated and user.is_admin
-            or super().has_object_permission(request, view, obj)
+            request.method in permissions.SAFE_METHODS
+            or obj.author == request.user
+            or request.user.is_moderator
+            or request.user.is_admin
         )

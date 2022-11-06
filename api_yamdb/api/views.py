@@ -2,15 +2,15 @@ import codecs
 import csv
 
 from django.core.mail import EmailMessage
-from rest_framework import (response, filters,
-                            generics, status, viewsets)
+from rest_framework import (filters, generics,
+                            status, viewsets)
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.permissions import (ObjectReadOnly, AuthorOrReadOnly,
-                             AdminOnly, AdminOrReadOnly)
+from api.permissions import (AnonReadOnly, AuthorOrReadOnly,
+                             AdminOnly, AdminModeratorAuthorOrReadOnly)
 from api.serializers import (CategorySerializer, SignupSerializer,
                              TokenSerializer, UserSerializer,
                              NotAdminSerializer)
@@ -19,7 +19,7 @@ from users.models import User
 
 
 class APITokenView(generics.CreateAPIView):
-    permission_classes = (ObjectReadOnly,)
+    permission_classes = (AnonReadOnly,)
 
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
@@ -41,7 +41,7 @@ class APITokenView(generics.CreateAPIView):
 
 
 class APISignupView(APIView):
-    permission_classes = (ObjectReadOnly,)
+    permission_classes = (AnonReadOnly,)
     serializer_class = SignupSerializer
 
     def send_email(data):
@@ -104,7 +104,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (ObjectReadOnly,)
+    permission_classes = (AnonReadOnly,)
 
     @action(detail=False, methods=['POST'])
     def upload_data_with_validation(self, request):
