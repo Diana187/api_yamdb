@@ -30,14 +30,14 @@ class APIToken(generics.CreateAPIView):
             user = User.objects.get(username=data['username'])
         except User.DoesNotExist:
             return Response(
-                {'username': 'Пользователь не найден!'},
+                {'username': 'Такого пользователя нет('},
                 status=status.HTTP_404_NOT_FOUND)
         if data.get('confirmation_code') == user.confirmation_code:
             token = RefreshToken.for_user(user).access_token
             return Response({'token': str(token)},
                             status=status.HTTP_201_CREATED)
         return Response(
-            {'confirmation_code': 'Неверный код подтверждения!'},
+            {'confirmation_code': 'Этот код подтверждения не подходит('},
             status=status.HTTP_400_BAD_REQUEST)
 
 
