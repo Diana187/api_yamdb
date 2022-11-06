@@ -56,27 +56,44 @@ class NotAdminSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """ Сериалайзер для модели Category."""
+    slug = serializers.SlugField()
 
     class Meta:
         model = Category
         fields = ('name', 'slug')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Category.objects.all(),
+                fields=('name', 'slug')
+            )
+        ]
 
 
 class GenreSerializer(serializers.ModelSerializer):
-
+    """ Сериалайзер для модели Genre."""
     class Meta:
         model = Category
         fields = ('name', 'slug')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Genre.objects.all(),
+                fields=('name', 'slug')
+            )
+        ]
+
 
 class TitleSerializer(serializers.ModelSerializer):
+    """ Сериалайзер для модели Titles."""
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
+    # permission_classes = (IsAdminOrReadOnly,)
 
     avg_score = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', '‘avg_score’',
+        fields = ('id', 'name', 'year', 'avg_score',
                   'description', 'genre', 'category')
 
     def get_queryset(self):
@@ -84,6 +101,26 @@ class TitleSerializer(serializers.ModelSerializer):
             rating=Avg("reviews__score"))
 
         return queryset
+
+
+# class TitleSerializerDetail(serializers.ModelSerializer):
+#     genre = GenreSerializer(many=True, required=False)
+#     category = CategorySerializer()
+#     # permission_classes = (IsAdminOrReadOnly,)
+#
+#     class Meta:
+#         model = Title
+#         fields = ('id', 'name', 'year', 'rating',
+#                   'description', 'genre', 'category')
+#
+#     def create(self, validated_data):
+#         genres = validated_data.pop('genre')
+#         title = Title.objects.create(**validated_data)
+#
+#         for genre in genres:
+#             current_genre, status = Genre.objects.get_or_create(**genre)
+#             title.objects.add(genre=current_genre)
+#         return title
 
 
 class ReviewSerializer(serializers.ModelSerializer):

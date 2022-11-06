@@ -1,15 +1,11 @@
-import codecs
-import csv
 
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
 from django.core.mail import EmailMessage
 from rest_framework.decorators import action
 from django.db.models import Avg
 from rest_framework.mixins import UpdateModelMixin
 from django.shortcuts import get_object_or_404
 from rest_framework import (filters, generics,
-                            status, viewsets)
+                            status, viewsets, mixins)
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -17,7 +13,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.permissions import (AnonReadOnly, AuthorOrReadOnly,
                              AdminOnly, AdminModeratorAuthorOrReadOnly)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, \
+    IsAuthenticatedOrReadOnly
 from rest_framework.pagination import LimitOffsetPagination
 from api.serializers import (CategorySerializer, SignupSerializer,
                              TokenSerializer, UserSerializer,
@@ -112,36 +109,21 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                      mixins.ListModelMixin, mixins.RetrieveModelMixin,
+                      GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (AnonReadOnly,)
-
-    @action(detail=False, methods=['post'])
-    def upload_data_with_validation(self, request):
-        """Загрузка данных из CSV с валидацией данных."""
-        file = request.FILES.get("file")
-        reader = csv.DictReader(codecs.iterdecode(file, "utf-8"))
-        data = list(reader)
-        serializer = self.serializer_class(data=data, many=True)
-        serializer.is_valid(raise_exception=True)
-
-        Category.objects.all().delete()
-        category_list = []
-        for row in serializer.data:
-            category_list.append(
-                Category(
-                    name=row["name"],
-                    slug=row["slug"],
-                )
-            )
-        Category.objects.bulk_create(category_list)
-        return Response("Данные успешно загружены в БД.")
+    permission_classes = (AnonReadOnly, AdminOnly)
+    pagination_class = LimitOffsetPagination
+    lookup_field = 'slug'
 
 
 class GenresViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (AnonReadOnly, AuthorOrReadOnly)
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -149,8 +131,13 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     pagination_class = LimitOffsetPagination
 
+    # def get_serializer_class(self):
+    #     if self.request.method in ('POST', 'PATCH',):
+    #         return TitleSerializerDetail
+    #     return TitleSerializerList
 
-class ReviewView(UpdateModelMixin, GenericViewSet):
+
+class ReviewViewSet(UpdateModelMixin, GenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
@@ -158,7 +145,8 @@ class ReviewView(UpdateModelMixin, GenericViewSet):
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
 
     def get_object(self):
         obj, _ = Review.score.objects.get_or_create(
