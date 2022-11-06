@@ -137,7 +137,8 @@ EMAIL_USE_SSL = False
 
 
 DJOSER = {
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    # 'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'ACTIVATION_URL': '/auth/token/',
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {},
 }
