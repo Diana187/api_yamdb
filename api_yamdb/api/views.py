@@ -11,8 +11,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.permissions import (ObjectReadOnly, AuthorOrReadOnly,
                              AdminOnly, AdminOrReadOnly)
-from api.serializers import (CategorySerializer, SignUpSerializer,
-                             GetTokenSerializer, UserSerializer,
+from api.serializers import (CategorySerializer, SignupSerializer,
+                             TokenSerializer, UserSerializer,
                              NotAdminSerializer)
 from reviews.models import Category
 from users.models import User
@@ -22,7 +22,7 @@ class APITokenView(generics.CreateAPIView):
     permission_classes = (ObjectReadOnly,)
 
     def post(self, request):
-        serializer = GetTokenSerializer(data=request.data)
+        serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         try:
@@ -42,6 +42,7 @@ class APITokenView(generics.CreateAPIView):
 
 class APISignupView(APIView):
     permission_classes = (ObjectReadOnly,)
+    serializer_class = SignupSerializer
 
     def send_email(data):
         email = EmailMessage(
@@ -52,7 +53,7 @@ class APISignupView(APIView):
         email.send()
 
     def post(self, request):
-        serializer = SignUpSerializer(data=request.data)
+        serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         email_body = (

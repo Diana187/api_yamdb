@@ -6,7 +6,7 @@ from reviews.models import Title, Category
 from users.models import User
 
 
-class GetTokenSerializer(serializers.ModelSerializer):
+class TokenSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         required=True)
     confirmation_code = serializers.CharField(
@@ -24,8 +24,11 @@ class GetTokenSerializer(serializers.ModelSerializer):
         ]
 
 
-class SignUpSerializer():
+class SignupSerializer():
     
+    class Meta:
+        model = User
+        fields = ('email', 'username')
 
 
 class UserSerializer():
