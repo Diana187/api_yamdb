@@ -26,8 +26,8 @@ INSTALLED_APPS = [
     'reviews.apps.ReviewsConfig',
     'api.apps.ApiConfig',
     'rest_framework',
+    'django_filters',
     'rest_framework.authtoken',
-    'djoser',
 ]
 
 MIDDLEWARE = [
@@ -116,17 +116,18 @@ FIRST_SYMBOLS = 50
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    # 'DEFAULT_FILTER_BACKENDS': [
-    #     'django_filters.rest_framework.DjangoFilterBackend'
-    # ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.SearchFilter',
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ],
 }
 
-
-# EMAIL_FROM = 'diamirchanova@gmail.com'
-# EMAIL_BCC = 'diamirchanova@gmail.com'
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'diamirchanova@gmail.com'
@@ -135,13 +136,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
-
-DJOSER = {
-    # 'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    'ACTIVATION_URL': '/auth/token/',
-    'SEND_ACTIVATION_EMAIL': True,
-    'SERIALIZERS': {},
-}
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
