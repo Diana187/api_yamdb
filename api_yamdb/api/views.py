@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 
+
 from .serializers import CategorySerializer, CommentSerializer, \
     ReviewSerializer, TitleSerializer
 from reviews.models import Category, Review, Title
@@ -67,6 +68,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         Title.objects.bulk_create(titles_list)
         return Response("Данные успешно загружены в БД.")
 
+
     def get_queryset(self):
         queryset = Title.objects.annotate(rating=Avg("reviews__score"))
 
@@ -111,3 +113,4 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
+
