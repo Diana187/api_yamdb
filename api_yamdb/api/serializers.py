@@ -24,18 +24,21 @@ class TokenSerializer(serializers.ModelSerializer):
         ]
 
 
-class SignupSerializer():
-    
+class SignupSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ('email', 'username')
+        fields = ('email', 'username',)
 
 
-class UserSerializer():
-    pass
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('username', 'email',)
 
 
-class NotAdminSerializer():
+class NotAdminSerializer(serializers.ModelSerializer):
     pass
 
 
