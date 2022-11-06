@@ -106,6 +106,8 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
 AUTH_USER_MODEL = 'users.User'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 FIRST_SYMBOLS = 50
 
 <<<<<<< HEAD
@@ -172,4 +174,11 @@ SCORE_CHOICES = [
     ('8', 8),
     ('9', 9),
     ('10', 10),
+]
+
+
+USER_ROLE_CHOICES = [
+    ('user', 'user'),
+    ('moderator', 'moderator'),
+    ('admin', 'admin')
 ]

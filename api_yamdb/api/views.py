@@ -1,7 +1,10 @@
 import codecs
 import csv
 
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets
 from django.core.mail import EmailMessage
+from rest_framework.decorators import action
 from django.db.models import Avg
 from rest_framework.mixins import UpdateModelMixin
 from django.shortcuts import get_object_or_404
@@ -9,7 +12,6 @@ from rest_framework import (filters, generics,
                             status, viewsets)
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -19,14 +21,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import LimitOffsetPagination
 from api.serializers import (CategorySerializer, SignupSerializer,
                              TokenSerializer, UserSerializer,
-                             NotAdminSerializer)
-from reviews.models import Category
+                             NotAdminSerializer, CommentSerializer,
+                             GenreSerializer, TitleSerializer,
+                             ReviewSerializer)
+from reviews.models import Category, Review, Title, Genre, Comment
 from users.models import User
-
-
-from .serializers import (CategorySerializer, CommentSerializer,
-                          ReviewSerializer, TitleSerializer)
-from reviews.models import Category, Review, Title
 
 
 class APITokenView(generics.CreateAPIView):
@@ -120,12 +119,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def upload_data_with_validation(self, request):
-        """Upload data from CSV, with validation."""
+        """Загрузка данных из CSV с валидацией данных."""
         file = request.FILES.get("file")
-        reader = csv.DictReader(codecs.iterdecode(file, "utf-8"), delimiter=",")
+        reader = csv.DictReader(codecs.iterdecode(file, "utf-8"))
         data = list(reader)
         serializer = self.serializer_class(data=data, many=True)
         serializer.is_valid(raise_exception=True)
+
+        Category.objects.all().delete()
         category_list = []
         for row in serializer.data:
             category_list.append(
@@ -138,39 +139,15 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response("Данные успешно загружены в БД.")
 
 
+class GenresViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-
-    @action(detail=False, methods=['POST'])
-    def upload_data_with_validation(self, request):
-        file = request.FILES.get('file')
-        reader = csv.DictReader(
-            codecs.iterdecode(file, 'utf-8'),
-            delimeter=','
-        )
-        data = list(reader)
-        serializer = self.serializer_class(data=data, many=True)
-        serializer.is_valid(raise_exception=True)
-
-        titles_list = []
-        for row in serializer.data:
-            titles_list.append(
-                Title(
-                    name=row['name'],
-                    year=row['year'],
-                    category=row['category'],
-                )
-            )
-
-        Title.objects.bulk_create(titles_list)
-        return Response("Данные успешно загружены в БД.")
-
-
-    def get_queryset(self):
-        queryset = Title.objects.annotate(rating=Avg("reviews__score"))
-
-        return queryset
+    pagination_class = LimitOffsetPagination
 
 
 class ReviewView(UpdateModelMixin, GenericViewSet):
@@ -187,7 +164,7 @@ class ReviewView(UpdateModelMixin, GenericViewSet):
         obj, _ = Review.score.objects.get_or_create(
             user=self.request.user,
             title_id=self.kwargs['title']
-            )
+        )
 
         return obj
 
