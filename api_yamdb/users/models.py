@@ -19,5 +19,4 @@ class User(AbstractUser):
         max_length=255,
         null=True,
         blank=False,
-        default='XXXX'
     )
