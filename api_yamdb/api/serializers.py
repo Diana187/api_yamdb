@@ -1,7 +1,58 @@
+from django.db.models import Avg
 from rest_framework import serializers
-
 from rest_framework.relations import SlugRelatedField
+
+from rest_framework.validators import UniqueTogetherValidator
+
 from reviews.models import Title, Category, Review, Comment, Genre
+from users.models import User
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        fields = '__all__'
+        model = User
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=User.objects.all(),
+                fields=('user', 'confirmation_code',)
+            )
+        ]
+
+
+class SignupSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    email = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('email', 'username',)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    email = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'email',)
+
+    def validate_username(self, username):
+        if username == 'me':
+            raise serializers.ValidationError(
+                'Это имя нельзя использовать('
+            )
+        return username
+
+
+class NotAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -17,15 +68,22 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Category
         fields = ('name', 'slug')
 
-
 class TitleSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
 
+    avg_score = serializers.SerializerMethodField()
+
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'rating',
+        fields = ('id', 'name', 'year', '‘avg_score’',
                   'description', 'genre', 'category')
+
+    def get_queryset(self):
+        queryset = Title.objects.annotate(
+            rating=Avg("reviews__score"))
+
+        return queryset
 
 
 class ReviewSerializer(serializers.ModelSerializer):
