@@ -2,8 +2,8 @@ from rest_framework import permissions
 
 
 class ObjectReadOnly(permissions.BasePermission):
-    """Разрешены только безопасные запросы .
-    """
+    """Разрешены только безопасные запросы.
+    Доступно без токена."""
     def has_object_permission(self, request, view, obj):
         return request.method in permissions.SAFE_METHODS
 
@@ -20,7 +20,7 @@ class AuthorOrReadOnly(ObjectReadOnly):
 
 
 class AdminOnly(ObjectReadOnly):
-    """Разрешает доступ к списку и объекту
+    """Разрешает доступ к списку или объекту
     только пользователям с ролью admin.
     Также доступ имеют суперюзеры."""
 
@@ -34,7 +34,7 @@ class AdminOnly(ObjectReadOnly):
 
 
 class AdminOrReadOnly(ObjectReadOnly):
-    """Разрешает доступ к списку и объекту только для чтения.
+    """Разрешает доступ к списку или объекту только для чтения.
     Небезопасные запросы доступны только пользователям
     с ролью admin и суперюзерам."""
 

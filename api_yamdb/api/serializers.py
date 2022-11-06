@@ -4,11 +4,19 @@ from rest_framework import serializers
 from reviews.models import Title, Category
 
 
+class GetTokenSerializer():
+    pass
+
 
 class SignUpSerializer():
     pass
 
-class GetTokenSerializer():
+
+class UserSerializer():
+    pass
+
+
+class NotAdminSerializer():
     pass
 
 

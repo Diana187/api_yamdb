@@ -2,9 +2,8 @@ import codecs
 import csv
 
 from django.core.mail import EmailMessage
-from rest_framework import (permissions, response,
-                            generics, status)
-# from rest_framework import viewsets
+from rest_framework import (response, filters,
+                            generics, status, viewsets)
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -12,15 +11,15 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.permissions import (ObjectReadOnly, AuthorOrReadOnly,
                              AdminOnly, AdminOrReadOnly)
-from .serializers import (CategorySerializer, SignUpSerializer,
-                          GetTokenSerializer)
-from api.mixins import ListCreateDestroyViewSet
+from api.serializers import (CategorySerializer, SignUpSerializer,
+                             GetTokenSerializer, UserSerializer,
+                             NotAdminSerializer)
 from reviews.models import Category
 from users.models import User
 
 
-class APIToken(generics.CreateAPIView):
-    permission_classes = (permissions.AllowAny,)
+class APITokenView(generics.CreateAPIView):
+    permission_classes = (ObjectReadOnly,)
 
     def post(self, request):
         serializer = GetTokenSerializer(data=request.data)
@@ -41,10 +40,9 @@ class APIToken(generics.CreateAPIView):
             status=status.HTTP_400_BAD_REQUEST)
 
 
-class APISignup(APIView):
-    permission_classes = (permissions.AllowAny,)
+class APISignupView(APIView):
+    permission_classes = (ObjectReadOnly,)
 
-    @staticmethod
     def send_email(data):
         email = EmailMessage(
             subject=data['email_subject'],
@@ -71,18 +69,41 @@ class APISignup(APIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    pass
-    
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (AuthorOrReadOnly,)
+    lookup_field = 'username'
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
 
-
-class UserCreateViewSet(generics.CreateAPIView):
-    pass
+    @action(
+        methods=['GET', 'PATCH'],
+        detail=False,
+        permission_classes=(AuthorOrReadOnly,),
+        url_path='me')
+    def get_user_info(self, request):
+        serializer = UserSerializer(request.user)
+        if request.method == 'PATCH':
+            if request.user.is_admin:
+                serializer = UserSerializer(
+                    request.user,
+                    data=request.data,
+                    partial=True)
+            else:
+                serializer = NotAdminSerializer(
+                    request.user,
+                    data=request.data,
+                    partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (ObjectReadOnly,)
 
     @action(detail=False, methods=['POST'])
     def upload_data_with_validation(self, request):
@@ -105,7 +126,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
                 )
             )
         Category.objects.bulk_create(data_list)
-        return Response("Данные успешно загружены в БД.")
+        return Response('Данные успешно загружены в БД.')
 
 
 # class TitleViewSet(viewsets.ModelViewSet):
