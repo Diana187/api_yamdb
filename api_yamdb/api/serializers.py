@@ -8,6 +8,9 @@ from reviews.models import Title, Category
 class SignUpSerializer():
     pass
 
+class GetTokenSerializer():
+    pass
+
 
 class CategorySerializer(serializers.ModelSerializer):
 

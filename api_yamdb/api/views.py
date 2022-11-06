@@ -2,31 +2,43 @@ import codecs
 import csv
 
 from django.core.mail import EmailMessage
-from rest_framework import (permissions, mixins,
-                            response, viewsets,
+from rest_framework import (permissions, response,
                             generics, status)
-from rest_framework import viewsets
+# from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.permissions import (ObjectReadOnly, AuthorOrReadOnly,
                              AdminOnly, AdminOrReadOnly)
-from .serializers import CategorySerializer, SignUpSerializer
+from .serializers import (CategorySerializer, SignUpSerializer,
+                          GetTokenSerializer)
+from api.mixins import ListCreateDestroyViewSet
 from reviews.models import Category
 from users.models import User
 
 
-class ListCreateDestroyViewSet(
-        mixins.ListModelMixin,
-        mixins.CreateModelMixin,
-        mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
-    pass
+class APIToken(generics.CreateAPIView):
+    permission_classes = (permissions.AllowAny,)
 
-
-class CustomTokenObtain(generics.CreateAPIView):
-    pass
+    def post(self, request):
+        serializer = GetTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        try:
+            user = User.objects.get(username=data['username'])
+        except User.DoesNotExist:
+            return Response(
+                {'username': 'Пользователь не найден!'},
+                status=status.HTTP_404_NOT_FOUND)
+        if data.get('confirmation_code') == user.confirmation_code:
+            token = RefreshToken.for_user(user).access_token
+            return Response({'token': str(token)},
+                            status=status.HTTP_201_CREATED)
+        return Response(
+            {'confirmation_code': 'Неверный код подтверждения!'},
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 class APISignup(APIView):
