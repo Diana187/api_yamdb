@@ -2,7 +2,8 @@ import codecs
 import csv
 
 from rest_framework import (permissions, mixins,
-                            response, viewsets)
+                            response, viewsets,
+                            generics)
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -18,6 +19,17 @@ class ListCreateDestroyViewSet(
         mixins.CreateModelMixin,
         mixins.DestroyModelMixin,
         viewsets.GenericViewSet):
+    pass
+
+class UserCreateViewSet(generics.CreateAPIView):
+    pass
+
+
+class CustomTokenObtain(generics.CreateAPIView):
+    pass
+
+
+class UserViewSet(viewsets.ModelViewSet):
     pass
 
 
