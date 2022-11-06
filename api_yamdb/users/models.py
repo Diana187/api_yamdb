@@ -7,3 +7,10 @@ class User(AbstractUser):
         'Биография',
         blank=True,
     )
+    confirmation_code = models.CharField(
+        'код подтверждения',
+        max_length=255,
+        null=True,
+        blank=False,
+        default='XXXX'
+    )
