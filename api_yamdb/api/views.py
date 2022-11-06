@@ -57,7 +57,7 @@ class APISignupView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         email_body = (
-            f'Доброе дкень, {user.username}!'
+            f'Добрый день, {user.username}!'
             f'\nВаш код подтверждения: {user.confirmation_code}'
         )
         data = {
@@ -78,7 +78,7 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
 
     @action(
-        methods=['GET', 'PATCH'],
+        methods=['get', 'patch'],
         detail=False,
         permission_classes=(AuthorOrReadOnly,),
         url_path='me')
@@ -89,7 +89,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 serializer = UserSerializer(
                     request.user,
                     data=request.data,
-                    partial=True)
+                    partial=True
+                )
             else:
                 serializer = NotAdminSerializer(
                     request.user,
@@ -106,7 +107,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     permission_classes = (AnonReadOnly,)
 
-    @action(detail=False, methods=['POST'])
+    @action(detail=False, methods=['post'])
     def upload_data_with_validation(self, request):
         file = request.FILES.get('file')
         reader = csv.DictReader(

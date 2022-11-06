@@ -1,6 +1,5 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator, ValidationError
+from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import Title, Category
 from users.models import User
@@ -42,9 +41,9 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_username(self, username):
         if username == 'me':
             raise serializers.ValidationError(
-                'Недопустимое имя пользователя!'
+                'Это имя нельзя использовать('
             )
-        return
+        return username
 
 
 class NotAdminSerializer(serializers.ModelSerializer):
@@ -65,4 +64,3 @@ class CategorySerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Title
 #         fields = ('id', 'name', 'year', 'category')
-
