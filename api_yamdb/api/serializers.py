@@ -1,7 +1,9 @@
+from django.db.models import Avg
 from rest_framework import serializers
+from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueTogetherValidator
 
-from reviews.models import Title, Category
+from reviews.models import Title, Category, Review, Comment
 from users.models import User
 
 
@@ -58,9 +60,45 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ('id', 'name', 'slug')
 
+class TitleSerializer(serializers.ModelSerializer):
 
-# class TitleSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = Title
-#         fields = ('id', 'name', 'year', 'category')
+    avg_score = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Title
+        fields = ('id', 'name', 'year', 'category', 'avg_score')
+
+    def get_queryset(self):
+        queryset = Title.objects.annotate(
+            rating=Avg("reviews__score"))
+
+        return queryset
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    """ Сериалайзер для модели Review."""
+    author = SlugRelatedField(
+        slug_field='username',
+        read_only=True,
+        default=serializers.CurrentUserDefault(),
+    )
+
+
+    class Meta:
+        fields = '__all__'
+        read_only_fields = ('author',)
+        model = Review
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """ Сериалайзер для модели Comment."""
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault(),
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Comment
+        read_only_fields = ('review',)

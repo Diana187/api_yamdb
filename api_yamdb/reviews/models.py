@@ -23,6 +23,25 @@ class Title(models.Model):
 
 
 class Review(models.Model):
+    text = models.TextField(
+        'Текст отзыва',
+        help_text='Введите текст отзыва'
+    )
+
+    score = models.CharField(
+        'Рейтинг',
+        max_length=2,
+
+        choices=settings.SCORE_CHOICES,
+        null=True
+
+    )
+
+    pub_date = models.DateTimeField(
+        'Дата создания отзыва',
+        auto_now_add=True,
+        db_index=True,
+    )
     title = models.ForeignKey(
         Title,
         verbose_name='Произведение',
@@ -30,22 +49,12 @@ class Review(models.Model):
         related_name='reviews',
         help_text='название произведения',
     )
-    text = models.TextField(
-        'Текст отзыва',
-        help_text='Введите текст отзыва'
-    )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name='Автор отзыва',
         on_delete=models.CASCADE,
         related_name='reviews',
         help_text='Имя автора отзыва',
-    )
-    score = models.IntegerField('Рейтинг')
-    pub_date = models.DateTimeField(
-        'Дата создания отзыва',
-        auto_now_add=True,
-        db_index=True,
     )
 
     class Meta:
