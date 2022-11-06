@@ -1,6 +1,7 @@
 import codecs
 import csv
 
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.mixins import UpdateModelMixin
@@ -13,7 +14,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from .serializers import CategorySerializer, CommentSerializer, \
     ReviewSerializer, TitleSerializer
-from reviews.models import Category, Review, Comment, Title
+from reviews.models import Category, Review, Title
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -66,6 +67,12 @@ class TitleViewSet(viewsets.ModelViewSet):
             )
         Title.objects.bulk_create(titles_list)
         return Response("Данные успешно загружены в БД.")
+
+
+    def get_queryset(self):
+        queryset = Title.objects.annotate(rating=Avg("reviews__score"))
+
+        return queryset
 
 
 class ReviewView(UpdateModelMixin, GenericViewSet):
