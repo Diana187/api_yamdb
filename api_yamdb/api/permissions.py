@@ -8,9 +8,18 @@ class AnonReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.method in permissions.SAFE_METHODS
 
-    def has_permission(self, request, view):
-        return request.method in permissions.SAFE_METHODS
 
+# class AuthorOrReadOnly(permissions.BasePermission):
+#     """Изменять и удалять объект может
+#     его автор, модератор или админ."""
+
+#     def has_object_permission(self, request, view, obj):
+#         if request.user.is_authenticated:
+#             return (
+#                     request.user == obj.author
+#                     or request.user.role in ('admin', 'moderator')
+#             )
+#         return super().has_object_permission(request, view, obj)
 
 class AuthorOrReadOnly(permissions.BasePermission):
     """Изменять и удалять объект может
@@ -19,24 +28,37 @@ class AuthorOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.user.is_authenticated:
             return (
-                    request.user == obj.author
-                    or request.user.role in ('admin', 'moderator')
+                request.user == obj.author
+                or request.user.is_admin
+                or request.user.is_moderator
             )
         return super().has_object_permission(request, view, obj)
 
+
+# class AdminOnly(permissions.BasePermission):
+#     """Разрешает доступ к списку или объекту
+#     только пользователям с ролью admin.
+#     Также доступ имеют суперюзеры."""
+
+#     def has_permission(self, request, view):
+#         return (request.user.is_authenticated
+#                 and request.user.role == 'admin')
+
+#     def has_object_permission(self, request, view, obj):
+#         return (request.user.is_authenticated
+#                 and request.user.role == 'admin')
 
 class AdminOnly(permissions.BasePermission):
     """Разрешает доступ к списку или объекту
     только пользователям с ролью admin.
     Также доступ имеют суперюзеры."""
-
+#AttributeError: 'User' object has no attribute 'is_admin'
+#здесь что-то не так, но я пока не могу понять, что именно
     def has_permission(self, request, view):
-        return (request.user.is_authenticated
-                and request.user.role == 'admin')
+        return request.user.is_authenticated and request.user.is_admin
 
     def has_object_permission(self, request, view, obj):
-        return (request.user.is_authenticated
-                and request.user.role == 'admin')
+        return request.user.is_authenticated and request.user.is_admin
 
 
 class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
@@ -46,14 +68,14 @@ class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return (
-                request.method in permissions.SAFE_METHODS
-                or request.user.is_authenticated
+            request.method in permissions.SAFE_METHODS
+            or request.user.is_authenticated
         )
 
     def has_object_permission(self, request, view, obj):
         return (
-                request.method in permissions.SAFE_METHODS
-                or obj.author == request.user
-                or request.user.is_moderator
-                or request.user.is_admin
+            request.method in permissions.SAFE_METHODS
+            or obj.author == request.user
+            or request.user.is_moderator
+            or request.user.is_admin
         )
