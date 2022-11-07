@@ -16,13 +16,6 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = User
 
-        # validators = [
-        #     UniqueTogetherValidator(
-        #         queryset=User.objects.all(),
-        #         fields=('username', 'confirmation_code',)
-        #     )
-        # ]
-
 
 class SignupSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
