@@ -1,10 +1,7 @@
-import codecs
-import csv
 import uuid
 
 from django.core.mail import EmailMessage
 from rest_framework.decorators import action
-from django.db.models import Avg
 from rest_framework.mixins import UpdateModelMixin
 from django.shortcuts import get_object_or_404
 from rest_framework import (filters, generics,
@@ -15,7 +12,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.permissions import (AnonReadOnly, AuthorOrReadOnly, 
-                             AdminOnly, AdminModeratorAuthorOrReadOnly)
+                             AdminOrReaOnly, AdminModeratorAuthorOrReadOnly)
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.pagination import LimitOffsetPagination
@@ -30,6 +27,7 @@ from users.models import User
 
 class APITokenView(generics.CreateAPIView):
     permission_classes = (AnonReadOnly,)
+    serializer_class = TokenSerializer
 
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
@@ -43,7 +41,7 @@ class APITokenView(generics.CreateAPIView):
             user = User.objects.get(username=data['username'])
         except User.DoesNotExist:
             return Response(
-                {'username': 'Такого пользователя нет('},
+                f'Такого пользователя {data["username"]} не зарегистрировано(',
                 status=status.HTTP_404_NOT_FOUND)
         if data.get('confirmation_code') == user.confirmation_code:
             token = RefreshToken.for_user(user).access_token
@@ -116,12 +114,10 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class CategoryViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                      mixins.ListModelMixin, mixins.RetrieveModelMixin,
-                      GenericViewSet):
+class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (AnonReadOnly, AdminOnly)
+    permission_classes = (AdminOrReaOnly, )
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
 
@@ -129,7 +125,7 @@ class CategoryViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
 class GenresViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (AnonReadOnly, AuthorOrReadOnly)
+    permission_classes = (AdminOrReaOnly, )
     lookup_field = 'slug'
 
 
@@ -137,6 +133,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     pagination_class = LimitOffsetPagination
+    permission_classes = (AdminOrReaOnly,)
 
     # def get_serializer_class(self):
     #     if self.request.method in ('POST', 'PATCH',):
@@ -145,7 +142,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(UpdateModelMixin, GenericViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AnonReadOnly, ]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     lookup_field = 'title'
