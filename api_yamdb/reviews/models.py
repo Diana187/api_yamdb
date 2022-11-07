@@ -4,7 +4,7 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField('Категория', max_length=50)
-    slug = models.SlugField('Слаг', default='слаг не указан')
+    slug = models.SlugField('Слаг', default='слаг не указан', unique=True)
 
     class Meta:
         verbose_name = 'Категория'
@@ -42,6 +42,7 @@ class Title(models.Model):
         Genre,
         verbose_name='жанр',
         help_text='наименование жанра',
+        related_name='titles',
     )
     description = models.CharField(
         'Описание произведения',
