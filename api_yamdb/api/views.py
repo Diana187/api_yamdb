@@ -1,3 +1,6 @@
+import codecs
+import csv
+import uuid
 
 from django.core.mail import EmailMessage
 from rest_framework.decorators import action
@@ -11,10 +14,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.permissions import (AnonReadOnly, AuthorOrReadOnly,
+from api.permissions import (AnonReadOnly, AuthorOrReadOnly, 
                              AdminOnly, AdminModeratorAuthorOrReadOnly)
-from rest_framework.permissions import IsAuthenticated, \
-    IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.pagination import LimitOffsetPagination
 from api.serializers import (CategorySerializer, SignupSerializer,
                              TokenSerializer, UserSerializer,
@@ -30,6 +33,10 @@ class APITokenView(generics.CreateAPIView):
 
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
+        # print(request.data)
+        # print(User.objects.filter(username=request.data['username'], 
+        #     confirmation_code=request.data['confirmation_code']).one())
+        # raise
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         try:
@@ -51,7 +58,7 @@ class APISignupView(APIView):
     permission_classes = (AnonReadOnly,)
     serializer_class = SignupSerializer
 
-    def send_email(data):
+    def send_email(self, data):
         email = EmailMessage(
             subject=data['email_subject'],
             body=data['email_body'],
@@ -62,7 +69,7 @@ class APISignupView(APIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        user = serializer.save(confirmation_code=str(uuid.uuid4()))
         email_body = (
             f'Добрый день, {user.username}!'
             f'\nВаш код подтверждения: {user.confirmation_code}'
@@ -87,7 +94,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(
         methods=['get', 'patch'],
         detail=False,
-        permission_classes=(AuthorOrReadOnly,),
+        permission_classes=(AuthorOrReadOnly, IsAuthenticated),
         url_path='me')
     def get_user_info(self, request):
         serializer = UserSerializer(request.user)
