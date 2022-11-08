@@ -48,26 +48,19 @@ class SignupSerializer(serializers.ModelSerializer, ValidateUsernameEmailMixin):
         fields = ('email', 'username',)
 
 
-class UserSerializer(serializers.ModelSerializer,ValidateUsernameEmailMixin):
+class UserSerializer(serializers.ModelSerializer, ValidateUsernameEmailMixin):
     username = serializers.CharField(required=True)
     email = serializers.CharField(required=True)
 
     class Meta:
         model = User
-        fields = ('username', 'email',)
-
-    #def validate_username(self, username):
-        #if username == 'me':
-            # serializers.ValidationError(
-                #'Это имя нельзя использовать('
-            #)
-        #return username
+        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
 
 
 class NotAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email',)
+        fields = ('username', 'email')
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -90,7 +83,7 @@ class GenreSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField()
 
     class Meta:
-        model = Category
+        model = Genre
         fields = ('name', 'slug')
         validators = [
             UniqueTogetherValidator(
