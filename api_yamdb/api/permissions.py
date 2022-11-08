@@ -28,15 +28,40 @@ class AdminOrReaOnly(permissions.BasePermission):
     Также доступ имеют суперюзеры, остальные читают."""
 
     def has_permission(self, request, view):
-
         return (request.method in permissions.SAFE_METHODS
                 or (request.user.is_authenticated
-                    and (request.user.role in ('admin', 'moderator')
+                    and (request.user.role in ('admin')
                          or request.user.is_staff
                          or request.user.is_superuser
                          )
                     )
                 )
+
+    # def has_permission(self, request, view):
+    #     return request.method in permissions.SAFE_METHODS or (
+    #         request.user.is_authenticated
+    #         and (request.user.is_staff
+    #              or request.user.is_superuser
+    #              or request.user.role in ('admin')
+    #         )
+    #     )
+
+
+# class AdminOrReaOnly(permissions.IsAdminUser):
+#     """Разрешает доступ к списку или объекту
+#     только пользователям с ролью admin.
+#     Также доступ имеют суперюзеры, остальные читают."""
+
+#     def has_permission(self, request, view):
+
+#         return (request.method in permissions.SAFE_METHODS
+#                 or (request.user.is_authenticated
+#                     and (request.user.role in ('admin', 'moderator')
+#                          or request.user.is_staff
+#                          or request.user.is_superuser
+#                          )
+#                     )
+#                 )
 
 
 class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
@@ -58,7 +83,7 @@ class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
         )
 
 
-class IsAdmin(permissions.BasePermission):
+class IsAdmin(permissions.IsAdminUser):
     def has_permission(self, request, view):
         user = request.user
         return (user.is_authenticated and request.user.role in ('admin',)
