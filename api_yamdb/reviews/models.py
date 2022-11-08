@@ -7,7 +7,7 @@ from users.models import User
 
 class Category(models.Model):
     name = models.CharField('Категория', max_length=50)
-    slug = models.SlugField('Слаг', default='слаг не указан', unique=True)
+    slug = models.SlugField('Слаг', unique=True)
 
     class Meta:
         verbose_name = 'Категория'
@@ -20,7 +20,7 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField('Жанр', max_length=50)
-    slug = models.SlugField('Слаг', default='слаг не указан')
+    slug = models.SlugField('Слаг', unique=True)
 
     class Meta:
         verbose_name = 'Жанр'
