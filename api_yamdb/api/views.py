@@ -6,13 +6,14 @@ from rest_framework.mixins import UpdateModelMixin
 from django.shortcuts import get_object_or_404
 from rest_framework import (filters, generics,
                             status, viewsets, mixins)
+from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.permissions import (AnonReadOnly, AuthorOrReadOnly, 
-                             AdminOrReaOnly, AdminModeratorAuthorOrReadOnly)
+                             AdminOrReaOnly, AdminModeratorAuthorOrReadOnly, IsAdmin)
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.pagination import LimitOffsetPagination
@@ -84,7 +85,7 @@ class APISignupView(APIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (AuthorOrReadOnly,)
+    permission_classes = (IsAdmin,)
     lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
@@ -92,10 +93,14 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(
         methods=['get', 'patch'],
         detail=False,
-        permission_classes=(AuthorOrReadOnly, IsAuthenticated),
+        permission_classes=[IsAuthenticated],
         url_path='me')
     def get_user_info(self, request):
         serializer = UserSerializer(request.user)
+        if request.method == 'GET':
+            serializer = UserSerializer(instance=request.user)
+            return Response(serializer.data, status=HTTP_200_OK)
+
         if request.method == 'PATCH':
             if request.user.is_admin:
                 serializer = UserSerializer(
@@ -117,7 +122,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (AdminOrReaOnly, )
+    permission_classes = (IsAdmin,AnonReadOnly )
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
 
@@ -151,6 +156,11 @@ class ReviewViewSet(UpdateModelMixin, GenericViewSet):
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
+
+    #def get_queryset(self):
+        #title_id = self.kwargs.get('title_id')
+        #title = get_object_or_404(Title, id=title_id)
+        #return title.reviews.all()
 
     def get_object(self):
         obj, _ = Review.score.objects.get_or_create(

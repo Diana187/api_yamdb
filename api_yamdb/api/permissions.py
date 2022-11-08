@@ -39,7 +39,6 @@ class AdminOrReaOnly(permissions.BasePermission):
                 )
 
 
-
 class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
     """Разрешает доступ к списку или объекту только для чтения.
     Небезопасные запросы доступны только пользователям
@@ -57,3 +56,10 @@ class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
             or obj.author == request.user
             or request.user.role in ('admin', 'moderator')
         )
+
+
+class IsAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        return (user.is_authenticated and request.user.role in ('admin',)
+                or user.is_superuser)
