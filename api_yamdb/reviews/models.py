@@ -1,5 +1,8 @@
 from django.conf import settings
+#from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+from users.models import User
 
 
 class Category(models.Model):
@@ -73,10 +76,8 @@ class Review(models.Model):
     score = models.CharField(
         'Рейтинг',
         max_length=2,
-
         choices=settings.SCORE_CHOICES,
         null=True
-
     )
 
     pub_date = models.DateTimeField(
@@ -89,10 +90,10 @@ class Review(models.Model):
         verbose_name='Произведение',
         on_delete=models.CASCADE,
         related_name='reviews',
-        help_text='название произведения',
+        help_text='название произведения'
     )
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         verbose_name='Автор отзыва',
         on_delete=models.CASCADE,
         related_name='reviews',
@@ -100,6 +101,12 @@ class Review(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'],
+                name='unique_review'
+            )
+        ]
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         ordering = ('-pub_date',)
@@ -117,7 +124,7 @@ class Comment(models.Model):
         help_text='ID отзыва',
     )
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         verbose_name='Автор комментария',
         on_delete=models.CASCADE,
         related_name='comments',
