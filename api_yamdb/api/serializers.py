@@ -41,7 +41,6 @@ class TokenSerializer(serializers.ModelSerializer):
 class SignupSerializer(serializers.ModelSerializer, ValidateUsernameEmailMixin):
     username = serializers.CharField(required=True)
     email = serializers.CharField(required=True)
-    # confirmation_code = serializers.CharField(required=True)
 
     class Meta:
         model = User
@@ -176,27 +175,26 @@ class ReviewSerializer(serializers.ModelSerializer):
         return data
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    """ Сериалайзер для модели Titles."""
-    genre = GenreSerializer(many=True)
-    category = CategorySerializer()
-    # permission_classes = (IsAdminOrReadOnly,)
+# class TitleSerializer(serializers.ModelSerializer):
+#     """ Сериалайзер для модели Titles."""
+#     genre = GenreSerializer(many=True)
+#     category = CategorySerializer()
+#     # permission_classes = (IsAdminOrReadOnly,)
 
-    rating = serializers.SerializerMethodField()
-    review = ReviewSerializer(many=True)
-    # rating = Title.objects.annotate(rating=Avg("reviews__score"))
-    # queryset = Title.objects.all()
+#     rating = serializers.SerializerMethodField()
+#     review = ReviewSerializer(many=True)
+#     # rating = Title.objects.annotate(rating=Avg("reviews__score"))
+#     # queryset = Title.objects.all()
 
-    class Meta:
-        model = Title
-        fields = ('id', 'name', 'year', 'rating',
-                  'description', 'genre', 'category', 'review')
+#     class Meta:
+#         model = Title
+#         fields = ('id', 'name', 'year', 'rating',
+#                   'description', 'genre', 'category', 'review')
 
-
-    def get_queryset(self):
-        queryset = Title.objects.annotate(
-            rating=Avg("reviews__score"))
-        return queryset
+#     def get_queryset(self):
+#         queryset = Title.objects.annotate(
+#             rating=Avg("reviews__score"))
+#         return queryset
 
 
 # class TitleSerializerDetail(serializers.ModelSerializer):
@@ -217,3 +215,31 @@ class TitleSerializer(serializers.ModelSerializer):
 #             current_genre, status = Genre.objects.get_or_create(**genre)
 #             title.objects.add(genre=current_genre)
 #         return title
+
+class TitleReadSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(
+        read_only=True,
+        many=True
+    )
+    rating = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Title
+
+
+class TitleCreateSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Title

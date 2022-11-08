@@ -20,8 +20,9 @@ from rest_framework.pagination import LimitOffsetPagination
 from api.serializers import (CategorySerializer, SignupSerializer,
                              TokenSerializer, UserSerializer,
                              NotAdminSerializer, CommentSerializer,
-                             GenreSerializer, TitleSerializer,
+                             GenreSerializer, TitleReadSerializer, TitleCreateSerializer,
                              ReviewSerializer)
+# TitleSerializer
 from reviews.models import Category, Review, Title, Genre, Comment
 from users.models import User
 
@@ -141,16 +142,31 @@ class GenresViewSet(CreateListDestroyViewSet):
     lookup_field = 'slug'
 
 
-class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = (AdminOrReaOnly, )
+# class TitleViewSet(viewsets.ModelViewSet):
+#     queryset = Title.objects.all()
+#     serializer_class = TitleSerializer
+#     pagination_class = LimitOffsetPagination
+#     permission_classes = (AdminOrReaOnly, )
 
     # def get_serializer_class(self):
     #     if self.request.method in ('POST', 'PATCH',):
     #         return TitleSerializerDetail
     #     return TitleSerializerList
+
+class TitleViewSet(viewsets.ModelViewSet):
+    """
+    Получить список всех объектов. Права доступа: Доступно без токена
+    """
+    queryset = Title.objects.all()
+    permission_classes = (AdminOrReaOnly, )
+    pagination_class = LimitOffsetPagination
+    # filter_backends = (DjangoFilterBackend, )
+    # filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return TitleReadSerializer
+        return TitleCreateSerializer
 
 
 class ReviewViewSet(UpdateModelMixin, GenericViewSet):
