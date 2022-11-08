@@ -104,18 +104,14 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = UserSerializer(instance=request.user)
             return Response(serializer.data, status=HTTP_200_OK)
 
-        if request.method == 'PATCH':
-            if request.user.is_admin:
-                serializer = UserSerializer(
-                    request.user,
-                    data=request.data,
-                    partial=True
-                )
-            else:
-                serializer = NotAdminSerializer(
-                    request.user,
-                    data=request.data,
-                    partial=True)
+        if (request.method == 'PATCH'
+                and request.user.role in ('admin', 'superuser')):
+            serializer = UserSerializer(
+                request.user,
+                data=request.data,
+                partial=True
+            )
+
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
