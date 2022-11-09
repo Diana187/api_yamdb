@@ -1,7 +1,9 @@
 import uuid
 
 from django.core.mail import EmailMessage
+from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework.decorators import action
 from rest_framework.mixins import (UpdateModelMixin, CreateModelMixin,
                                    ListModelMixin, DestroyModelMixin)
@@ -14,7 +16,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.permissions import (AnonReadOnly, AdminOrReaOnly, IsAdmin)
+from api.permissions import (AdminModeratorAuthorOrReadOnly, AnonReadOnly,
+                             AdminOrReaOnly, IsAdmin)
 from rest_framework.permissions import (IsAuthenticated,)
 from rest_framework.pagination import LimitOffsetPagination
 from api.serializers import (CategorySerializer, SignupSerializer,
@@ -141,7 +144,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     """
     Получить список всех объектов. Права доступа: Доступно без токена
     """
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(Avg('reviews__score')).order_by('name')
     permission_classes = (AdminOrReaOnly, )
     pagination_class = LimitOffsetPagination
 
@@ -152,9 +155,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    permission_classes = [AnonReadOnly, ]
-    # permission_classes = (AnonReadOnly, IsAdmin, )
-    queryset = Review.objects.all()
+    permission_classes = (AdminModeratorAuthorOrReadOnly, )
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
 
@@ -162,24 +163,23 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
 
-    def get_object(self):
-        obj, _ = Review.score.objects.get_or_create(
-            user=self.request.user,
-            title_id=self.kwargs['title']
-        )
+    def get_queryset(self):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        return title.reviews.all()
 
-        return obj
+    #def get_object(self):
+        #obj, _ = Review.score.objects.get_or_create(
+            #user=self.request.user,
+            #title_id=self.kwargs['title']
+        #)
 
-    def post(self, request):
-        review = ReviewSerializer(data=request.data)
-        if review.is_valid():
-            review.save()
-        return Response(status=201)
+        #return obj
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = (AdminModeratorAuthorOrReadOnly, )
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
