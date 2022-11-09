@@ -151,7 +151,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleCreateSerializer
 
 
-class ReviewViewSet(UpdateModelMixin, GenericViewSet):
+class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [AnonReadOnly, ]
     # permission_classes = (AnonReadOnly, IsAdmin, )
     queryset = Review.objects.all()
