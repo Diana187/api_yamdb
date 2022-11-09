@@ -144,8 +144,12 @@ class TitleViewSet(viewsets.ModelViewSet):
     """
     Получить список всех объектов. Права доступа: Доступно без токена
     """
-    queryset = Title.objects.all().annotate(Avg('reviews__score')).order_by('name')
+    queryset = (Title.objects.all()
+                .annotate(Avg('reviews__score'))
+                .order_by('name'))
     permission_classes = (AdminOrReaOnly, )
+    filter_backends = (DjangoFilterBackend,)
+    # filterset_fields = ('title_genre_slug', )
     pagination_class = LimitOffsetPagination
 
     def get_serializer_class(self):
