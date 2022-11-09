@@ -1,6 +1,5 @@
 import datetime
 
-from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.relations import SlugRelatedField
@@ -122,6 +121,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
+    """ Сериалайзер для модели Title (чтение)."""
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(
         read_only=True,
@@ -138,6 +138,7 @@ class TitleReadSerializer(serializers.ModelSerializer):
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
+    """ Сериалайзер для модели Title (создание)."""
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
         slug_field='slug'
@@ -159,8 +160,8 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         Нельзя добавлять произведения, которые еще не вышли
         (год выпуска не может быть больше текущего)
         """
-        if int(value) > datetime.datetime.now().year:
+        if value > datetime.datetime.now().year:
             raise serializers.ValidationError(
                 'Год выпуска не может быть больше текущего'
             )
-        return int(value)
+        return value

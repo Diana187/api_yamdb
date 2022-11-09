@@ -148,9 +148,9 @@ class TitleViewSet(viewsets.ModelViewSet):
                 .annotate(Avg('reviews__score'))
                 .order_by('name'))
     permission_classes = (AdminOrReaOnly, )
-    filter_backends = (DjangoFilterBackend,)
-    # filterset_fields = ('title_genre_slug', )
     pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('genre__slug',)
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
