@@ -100,11 +100,9 @@ class ReviewSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault(),
     )
 
-    comment = CommentSerializer(many=True)
-
     class Meta:
         fields = ('id', 'text', 'author', 'score',
-                  'pub_date', 'comment')
+                  'pub_date')
         read_only_fields = ('author',)
         model = Review
 
@@ -149,8 +147,9 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'name', 'year', 'rating', 'description',
-                  'genre', 'category')
+        fields = (
+            '__all__'
+        )
         model = Title
 
     def validate_year(self, value):
