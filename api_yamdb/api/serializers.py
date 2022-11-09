@@ -11,6 +11,10 @@ from users.models import User
 class ValidateUsernameEmailMixin:
     """Миксин проверки email и корректного имени пользователя.
     """
+    username = serializers.RegexField(max_length=50,
+                                      regex=r'^[\w.@+-]+\Z', required=True)
+    email = serializers.EmailField(required=True)
+
     def validate_email(self, value):
         if User.objects.filter(email__iexact=value).exists():
             raise ValidationError(
@@ -24,7 +28,11 @@ class ValidateUsernameEmailMixin:
             raise ValidationError(
                 'Запрещено использовать "me" в качестве имени пользователя'
             )
-
+        elif User.objects.filter(username=value).exists():
+            raise serializers.ValidationError(
+                'Данный username (имя) занято, '
+                'используйте другое '
+            )
         return value
 
 
@@ -100,21 +108,20 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'score',
-                  'pub_date')
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
         read_only_fields = ('author',)
         model = Review
 
     def validate(self, data):
-        if self.context['request'] != 'POST':
+        if self.context['request'].method != 'POST':
             return data
+
         title_id = self.context['view'].kwargs.get('title_id')
         author = self.context['request'].user
-        if Review.objects.filter(
-            author=author,
-            title=title_id
-        ).exists():
-            raise ValidationError(
+        if Review.objects.filter(author=author,
+                                 title=title_id
+                                 ).exists():
+            raise serializers.ValidationError(
                 'Отзыв к произведению уже написан.'
             )
         return data
