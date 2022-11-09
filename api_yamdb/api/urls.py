@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from .views import (APITokenView, CategoryViewSet,
                     APISignupView, UserViewSet,
-                    TitleViewSet, GenresViewSet, ReviewViewSet)
+                    TitleViewSet, GenresViewSet, ReviewViewSet, CommentViewSet)
 
 router_v1 = routers.SimpleRouter()
 router_v1.register('categories', CategoryViewSet)
@@ -12,11 +12,11 @@ router_v1.register('genres', GenresViewSet)
 router_v1.register(
     r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,
-    basename=r'titles/(?P<title_id>\d+)/reviews'
+    basename=r'reviews'
 )
 router_v1.register(
-    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments/',
-    ReviewViewSet,
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
+    CommentViewSet,
     basename=(
         r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments'
     )

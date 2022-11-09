@@ -1,9 +1,9 @@
+import datetime
+
 from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.relations import SlugRelatedField
-
-from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import Title, Category, Review, Comment, Genre
 from users.models import User
@@ -40,7 +40,7 @@ class TokenSerializer(serializers.ModelSerializer):
 
 class SignupSerializer(serializers.ModelSerializer, ValidateUsernameEmailMixin):
     username = serializers.CharField(required=True)
-    email = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
@@ -49,7 +49,7 @@ class SignupSerializer(serializers.ModelSerializer, ValidateUsernameEmailMixin):
 
 class UserSerializer(serializers.ModelSerializer, ValidateUsernameEmailMixin):
     username = serializers.CharField(required=True)
-    email = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
@@ -64,70 +64,18 @@ class NotAdminSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     """ Сериалайзер для модели Category."""
-    slug = serializers.SlugField()
 
     class Meta:
         model = Category
         fields = ('name', 'slug')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Category.objects.all(),
-                fields=('name', 'slug')
-            )
-        ]
 
 
 class GenreSerializer(serializers.ModelSerializer):
     """ Сериалайзер для модели Genre."""
-    slug = serializers.SlugField()
 
     class Meta:
         model = Genre
         fields = ('name', 'slug')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Genre.objects.all(),
-                fields=('name', 'slug')
-            )
-        ]
-
-#class ReviewRecursiveSerialaizer(serializers.Serializer):
-
-    #def to_representation(self, value):
-        #serializer = Review(value, context=self.context)
-        #return serializer.data
-
-# class TitleSerializerDetail(serializers.ModelSerializer):
-#     genre = GenreSerializer(many=True, required=False)
-#     category = CategorySerializer()
-#     # permission_classes = (IsAdminOrReadOnly,)
-#
-#     class Meta:
-#         model = Title
-#         fields = ('id', 'name', 'year', 'rating',
-#                   'description', 'genre', 'category')
-#
-#     def create(self, validated_data):
-#         genres = validated_data.pop('genre')
-#         title = Title.objects.create(**validated_data)
-#
-#         for genre in genres:
-#             current_genre, status = Genre.objects.get_or_create(**genre)
-#             title.objects.add(genre=current_genre)
-#         return title
-
-
-#class FilterReviewListSerializer(serializers.ListSerializer):
-    #def to_representation(self, data):
-       # data = data.filter(title=None)
-        #return super().to_representation(data)
-
-
-#class CommentRecursiveSerialaizer(serializers.Serializer):
-
-    #def to_representation(self, value):
-        #serializer = CommentSerializer(value, context=self.context)
-        #return serializer.data
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -175,47 +123,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         return data
 
 
-# class TitleSerializer(serializers.ModelSerializer):
-#     """ Сериалайзер для модели Titles."""
-#     genre = GenreSerializer(many=True)
-#     category = CategorySerializer()
-#     # permission_classes = (IsAdminOrReadOnly,)
-
-#     rating = serializers.SerializerMethodField()
-#     review = ReviewSerializer(many=True)
-#     # rating = Title.objects.annotate(rating=Avg("reviews__score"))
-#     # queryset = Title.objects.all()
-
-#     class Meta:
-#         model = Title
-#         fields = ('id', 'name', 'year', 'rating',
-#                   'description', 'genre', 'category', 'review')
-
-#     def get_queryset(self):
-#         queryset = Title.objects.annotate(
-#             rating=Avg("reviews__score"))
-#         return queryset
-
-
-# class TitleSerializerDetail(serializers.ModelSerializer):
-#     genre = GenreSerializer(many=True, required=False)
-#     category = CategorySerializer()
-#     # permission_classes = (IsAdminOrReadOnly,)
-#
-#     class Meta:
-#         model = Title
-#         fields = ('id', 'name', 'year', 'rating',
-#                   'description', 'genre', 'category')
-#
-#     def create(self, validated_data):
-#         genres = validated_data.pop('genre')
-#         title = Title.objects.create(**validated_data)
-#
-#         for genre in genres:
-#             current_genre, status = Genre.objects.get_or_create(**genre)
-#             title.objects.add(genre=current_genre)
-#         return title
-
 class TitleReadSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(
@@ -225,7 +132,8 @@ class TitleReadSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'rating', 'description',
+                  'genre', 'category')
         model = Title
 
 
@@ -241,5 +149,17 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'rating', 'description',
+                  'genre', 'category')
         model = Title
+
+    def validate_year(self, value):
+        """
+        Нельзя добавлять произведения, которые еще не вышли
+        (год выпуска не может быть больше текущего)
+        """
+        if int(value) > datetime.datetime.now().year:
+            raise serializers.ValidationError(
+                'Год выпуска не может быть больше текущего'
+            )
+        return value
