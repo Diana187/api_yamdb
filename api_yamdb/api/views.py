@@ -10,16 +10,16 @@ from rest_framework.mixins import (UpdateModelMixin, CreateModelMixin,
 from django.shortcuts import get_object_or_404
 from rest_framework import (filters, generics,
                             status, viewsets)
+from rest_framework.permissions import (IsAuthenticated,)
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from api.filters import FilterForTitle
 from api.permissions import (AdminModeratorAuthorOrReadOnly, AnonReadOnly,
                              AdminOrReaOnly, IsAdmin)
-from rest_framework.permissions import (IsAuthenticated,)
-from rest_framework.pagination import LimitOffsetPagination
 from api.serializers import (CategorySerializer, SignupSerializer,
                              TokenSerializer, UserSerializer,
                              NotAdminSerializer, CommentSerializer,
@@ -145,12 +145,11 @@ class TitleViewSet(viewsets.ModelViewSet):
     Получить список всех объектов. Права доступа: Доступно без токена
     """
     queryset = (Title.objects.all()
-                .annotate(Avg('reviews__score'))
-                .order_by('name'))
+                .annotate(Avg('reviews__score'))).order_by('name')
     permission_classes = (AdminOrReaOnly, )
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('genre__slug',)
+    filterset_class = FilterForTitle
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
