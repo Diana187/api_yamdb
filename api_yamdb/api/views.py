@@ -45,12 +45,15 @@ class APITokenView(generics.CreateAPIView):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
+
         try:
-            user = User.objects.get(username=data['username'])
+            User.objects.get(username=data['username'])
         except User.DoesNotExist:
             return Response(
-                f'Такого пользователя {data["username"]} не зарегистрировано(',
+                f'Пользователь {data["username"]} не зарегистрирован.',
                 status=status.HTTP_404_NOT_FOUND)
+
+        user = User.objects.get(username=data['username'])
         if data.get('confirmation_code') == user.confirmation_code:
             token = RefreshToken.for_user(user).access_token
             return Response({'token': str(token)},
