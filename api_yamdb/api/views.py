@@ -5,7 +5,7 @@ from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.decorators import action
-from rest_framework.mixins import (UpdateModelMixin, CreateModelMixin,
+from rest_framework.mixins import (CreateModelMixin,
                                    ListModelMixin, DestroyModelMixin)
 from django.shortcuts import get_object_or_404
 from rest_framework import (filters, generics,
@@ -22,11 +22,12 @@ from api.permissions import (AdminModeratorAuthorOrReadOnly, AnonReadOnly,
                              AdminOrReaOnly, IsAdmin)
 from api.serializers import (CategorySerializer, SignupSerializer,
                              TokenSerializer, UserSerializer,
-                             NotAdminSerializer, CommentSerializer,
+                             CommentSerializer,
                              GenreSerializer, TitleReadSerializer,
-                             TitleCreateSerializer, ReviewSerializer)
+                             TitleCreateSerializer, ReviewSerializer,
+                             ForUserSerializer)
 
-from reviews.models import Category, Review, Title, Genre, Comment
+from reviews.models import Category, Review, Title, Genre
 from users.models import User
 
 
@@ -107,18 +108,24 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = UserSerializer(instance=request.user)
             return Response(serializer.data, status=HTTP_200_OK)
 
-        if (request.method == 'PATCH'
-                and request.user.role in ('admin', 'superuser')):
+        if request.user.role in ('admin', 'superuser'):
             serializer = UserSerializer(
                 request.user,
                 data=request.data,
                 partial=True
             )
 
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.data)
+        elif request.user.role in ('user', 'moderator'):
+            serializer = ForUserSerializer(
+                request.user,
+                data=request.data,
+                partial=True
+            )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
