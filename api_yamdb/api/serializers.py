@@ -1,5 +1,5 @@
 import datetime
-
+from rest_framework.serializers import Serializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.relations import SlugRelatedField
@@ -34,7 +34,7 @@ class ValidateUsernameEmailMixin:
         return value
 
 
-class TokenSerializer(serializers.ModelSerializer):
+class TokenSerializer(Serializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 

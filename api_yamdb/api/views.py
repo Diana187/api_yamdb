@@ -37,7 +37,7 @@ class CreateListDestroyViewSet(CreateModelMixin, ListModelMixin,
     pass
 
 
-class APITokenView(generics.CreateAPIView):
+class APITokenView(APIView):
     permission_classes = (AnonReadOnly,)
     serializer_class = TokenSerializer
 
@@ -45,19 +45,17 @@ class APITokenView(generics.CreateAPIView):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        try:
-            user = User.objects.get(username=data['username'])
-        except User.DoesNotExist:
-            return Response(
-                f'Такого пользователя {data["username"]} не зарегистрировано(',
-                status=status.HTTP_404_NOT_FOUND)
+        user = get_object_or_404(User,username=data['username'])
+
         if data.get('confirmation_code') == user.confirmation_code:
-            token = RefreshToken.for_user(user).access_token
-            return Response({'token': str(token)},
+                token = RefreshToken.for_user(user).access_token
+                return Response({'token': str(token)},
                             status=status.HTTP_201_CREATED)
         return Response(
             {'confirmation_code': 'Этот код подтверждения не подходит('},
             status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class APISignupView(APIView):
