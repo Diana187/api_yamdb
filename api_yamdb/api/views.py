@@ -37,7 +37,7 @@ class CreateListDestroyViewSet(CreateModelMixin, ListModelMixin,
     pass
 
 
-class APITokenView(APIView):
+class APITokenView(generics.CreateAPIView):
     permission_classes = (AnonReadOnly,)
     serializer_class = TokenSerializer
 
@@ -54,8 +54,6 @@ class APITokenView(APIView):
         return Response(
             {'confirmation_code': 'Этот код подтверждения не подходит('},
             status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 class APISignupView(APIView):
