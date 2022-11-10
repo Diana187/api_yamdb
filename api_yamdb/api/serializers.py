@@ -9,8 +9,7 @@ from users.models import User
 
 
 class ValidateUsernameEmailMixin:
-    """Миксин проверки email и корректного имени пользователя.
-    """
+    """Миксин проверки email и корректного имени пользователя."""
     username = serializers.RegexField(max_length=50,
                                       regex=r'^[\w.@+-]+\Z', required=True)
     email = serializers.EmailField(required=True)
@@ -30,8 +29,7 @@ class ValidateUsernameEmailMixin:
             )
         elif User.objects.filter(username=value).exists():
             raise serializers.ValidationError(
-                'Данный username (имя) занято, '
-                'используйте другое '
+                f'Данное имя {value} занято, используйте другое...'
             )
         return value
 
@@ -61,6 +59,10 @@ class UserSerializer(serializers.ModelSerializer, ValidateUsernameEmailMixin):
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
+
+
+class ForUserSerializer(UserSerializer):
+    role = serializers.CharField(read_only=True)
 
 
 class NotAdminSerializer(serializers.ModelSerializer):
