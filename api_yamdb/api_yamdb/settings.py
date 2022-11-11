@@ -1,7 +1,6 @@
 import os
 from datetime import timedelta
 
-import rest_framework.permissions
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -168,8 +167,11 @@ SCORE_CHOICES = [
     ("9", 9),
     ("10", 10),
 ]
+
 MIN_SCORE = 1
 MAX_SCORE = 10
+
+
 USER_ROLE_CHOICES = [
     ("user", "user"),
     ("moderator", "moderator"),

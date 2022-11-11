@@ -130,7 +130,6 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-
 class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -180,14 +179,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
         return title.reviews.all()
-
-    #def get_object(self):
-        #obj, _ = Review.score.objects.get_or_create(
-            #user=self.request.user,
-            #title_id=self.kwargs['title']
-        #)
-
-        #return obj
 
 
 class CommentViewSet(viewsets.ModelViewSet):
