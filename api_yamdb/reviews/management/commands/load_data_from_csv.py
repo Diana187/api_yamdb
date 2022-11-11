@@ -6,7 +6,7 @@ from reviews.models import Category, Genre, Title, Review, Comment
 from users.models import User
 
 ALREDY_LOADED_ERROR_MESSAGE = """
-Перед загрузкой данных из CSV-файла, удалите файл БД db.sqlite3. 
+Перед загрузкой данных из CSV-файла, удалите файл БД db.sqlite3.
 Создайте миграции `python manage.py makemigrations`.
 Выполните миграции `python manage.py migrate`.
 """
@@ -22,8 +22,7 @@ class Command(BaseCommand):
                 or Title.objects.exists()
                 or Review.objects.exists()
                 or Comment.objects.exists()
-                or User.objects.exists()
-        ):
+                or User.objects.exists()):
             print('в таблице Жанры уже содержатся данные.')
             print(ALREDY_LOADED_ERROR_MESSAGE)
             return
@@ -141,7 +140,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("OK"))
 
 
-#============================================================================
+# ============================================================================
         # file_path_list = {
         #     User: 'static/data/users.csv',
         #     Category: 'static/data/category.csv',

@@ -43,7 +43,8 @@ class TokenSerializer(serializers.Serializer):
         model = User
 
 
-class SignupSerializer(serializers.ModelSerializer, ValidateUsernameEmailMixin):
+class SignupSerializer(serializers.ModelSerializer,
+                       ValidateUsernameEmailMixin):
     username = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
 
@@ -58,7 +59,10 @@ class UserSerializer(serializers.ModelSerializer, ValidateUsernameEmailMixin):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role'
+        )
 
 
 class ForUserSerializer(UserSerializer):
