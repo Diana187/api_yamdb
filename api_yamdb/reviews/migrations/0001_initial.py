@@ -9,15 +9,25 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, verbose_name='Категория')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                (
+                    'name',
+                    models.CharField(max_length=50, verbose_name='Категория'),
+                ),
                 ('slug', models.SlugField(unique=True, verbose_name='Слаг')),
             ],
             options={
@@ -29,9 +39,30 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Comment',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(help_text='Введите текст комментария', verbose_name='Текст комментария')),
-                ('pub_date', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата создания комментария')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                (
+                    'text',
+                    models.TextField(
+                        help_text='Введите текст комментария',
+                        verbose_name='Текст комментария',
+                    ),
+                ),
+                (
+                    'pub_date',
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name='Дата создания комментария',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Комментарий',
@@ -42,7 +73,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Genre',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('name', models.CharField(max_length=50, verbose_name='Жанр')),
                 ('slug', models.SlugField(unique=True, verbose_name='Слаг')),
             ],
@@ -55,10 +94,39 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Review',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(help_text='Введите текст отзыва', verbose_name='Текст отзыва')),
-                ('score', models.IntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(10)])),
-                ('pub_date', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата создания отзыва')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                (
+                    'text',
+                    models.TextField(
+                        help_text='Введите текст отзыва',
+                        verbose_name='Текст отзыва',
+                    ),
+                ),
+                (
+                    'score',
+                    models.IntegerField(
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(10),
+                        ]
+                    ),
+                ),
+                (
+                    'pub_date',
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name='Дата создания отзыва',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Отзыв',
@@ -69,13 +137,57 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Title',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200, verbose_name='Наименование произведения')),
-                ('year', models.IntegerField(verbose_name='Год создания произведения')),
-                ('description', models.CharField(blank=True, default='нет описания', max_length=250, verbose_name='Описание произведения')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                (
+                    'name',
+                    models.CharField(
+                        max_length=200,
+                        verbose_name='Наименование произведения',
+                    ),
+                ),
+                (
+                    'year',
+                    models.IntegerField(
+                        verbose_name='Год создания произведения'
+                    ),
+                ),
+                (
+                    'description',
+                    models.CharField(
+                        blank=True,
+                        default='нет описания',
+                        max_length=250,
+                        verbose_name='Описание произведения',
+                    ),
+                ),
                 ('rating', models.SmallIntegerField(default=0)),
-                ('category', models.ForeignKey(help_text='название категории', on_delete=django.db.models.deletion.CASCADE, related_name='titles', to='reviews.Category', verbose_name='категория')),
-                ('genre', models.ManyToManyField(help_text='наименование жанра', related_name='titles', to='reviews.Genre', verbose_name='жанр')),
+                (
+                    'category',
+                    models.ForeignKey(
+                        help_text='название категории',
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='titles',
+                        to='reviews.Category',
+                        verbose_name='категория',
+                    ),
+                ),
+                (
+                    'genre',
+                    models.ManyToManyField(
+                        help_text='наименование жанра',
+                        related_name='titles',
+                        to='reviews.Genre',
+                        verbose_name='жанр',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Произведение',
