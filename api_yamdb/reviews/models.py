@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-
 from users.models import User
 
 
@@ -40,7 +39,6 @@ class Title(models.Model):
         default='нет описания',
         blank=True,
     )
-    rating = models.SmallIntegerField(default=0)
     category = models.ForeignKey(
         Category,
         verbose_name='категория',
@@ -69,8 +67,10 @@ class Review(models.Model):
 
     score = models.IntegerField(
         validators=[
-            MinValueValidator(settings.MIN_SCORE),
-            MaxValueValidator(settings.MAX_SCORE),
+            MinValueValidator(settings.MIN_SCORE,
+                              message='Рейтинг ниже допустимого'),
+            MaxValueValidator(settings.MAX_SCORE,
+                              message='Рейтинг выше допустимого'),
         ],
     )
 
