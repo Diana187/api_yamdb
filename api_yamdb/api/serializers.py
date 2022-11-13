@@ -1,9 +1,10 @@
 import datetime
+
+from django.core.validators import MaxValueValidator
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
 from reviews.models import Title, Category, Review, Comment, Genre
-from reviews.validators import year_validator
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -72,7 +73,12 @@ class TitleReadSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(
         source='reviews__score__avg', read_only=True, default=0
     )
-    year = serializers.IntegerField(validators=[year_validator])
+    year = serializers.IntegerField(validators=[
+            MaxValueValidator(
+                datetime.datetime.now().year,
+                message='Годе не должен быть больше текущего'
+            )
+        ])
 
     class Meta:
         fields = (
