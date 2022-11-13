@@ -1,6 +1,5 @@
-from rest_framework import permissions
-
 from django.conf import settings
+from rest_framework import permissions
 
 
 class AnonReadOnly(permissions.BasePermission):
@@ -18,7 +17,8 @@ class AuthorOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.user.is_authenticated:
             return (request.user == obj.author
-                    or request.user.role in (settings.ADMIN, settings.MODERATOR)
+                    or request.user.is_admin
+                    or request.user.is_moderator
                     )
         return super().has_object_permission(request, view, obj)
 
@@ -30,12 +30,12 @@ class AdminOrReaOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return request.method in permissions.SAFE_METHODS or (
-            request.user.is_authenticated
-            and (
-                request.user.role == settings.ADMIN
-                or request.user.is_staff
-                or request.user.is_superuser
-            )
+                request.user.is_authenticated
+                and (
+                        request.user.is_admin
+                        or request.user.is_staff
+                        or request.user.is_superuser
+                )
         )
 
 
@@ -46,15 +46,16 @@ class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.is_authenticated
+                request.method in permissions.SAFE_METHODS
+                or request.user.is_authenticated
         )
 
     def has_object_permission(self, request, view, obj):
         return (
-            request.method in permissions.SAFE_METHODS
-            or obj.author == request.user
-            or request.user.role in (settings.ADMIN, settings.MODERATOR)
+                request.method in permissions.SAFE_METHODS
+                or obj.author == request.user
+                or request.user.is_admin
+                or request.user.is_moderator
         )
 
 
@@ -65,7 +66,8 @@ class IsAdmin(permissions.IsAdminUser):
     def has_permission(self, request, view):
         user = request.user
         return (
-            user.is_authenticated
-            and (request.user.role == settings.ADMIN
-                 or request.user.is_superuser)
+                user.is_authenticated
+                and (request.user.is_admin
+                     or request.user.is_superuser
+                     )
         )

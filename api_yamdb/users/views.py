@@ -93,12 +93,12 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = UserSerializer(instance=request.user)
             return Response(serializer.data, status=HTTP_200_OK)
 
-        if request.user.role in ('admin', 'superuser'):
+        if request.user.is_admin or request.user.is_superuser:
             serializer = UserSerializer(
                 request.user, data=request.data, partial=True
             )
 
-        elif request.user.role in ('user', 'moderator'):
+        elif request.user.is_user or request.user.is_moderator:
             serializer = ForUserSerializer(
                 request.user, data=request.data, partial=True
             )
