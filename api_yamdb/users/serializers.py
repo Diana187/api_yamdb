@@ -85,4 +85,3 @@ class NotAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email')
-
