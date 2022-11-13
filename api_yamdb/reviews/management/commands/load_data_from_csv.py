@@ -6,7 +6,7 @@ from reviews.models import Category, Genre, Title, Review, Comment
 from users.models import User
 
 ALREDY_LOADED_ERROR_MESSAGE = """
-Перед загрузкой данных из CSV-файла, удалите файл БД db.sqlite3.
+Перед загрузкой данных из CSV-файла, удалите файл БД db.sqlite3. 
 Создайте миграции `python manage.py makemigrations`.
 Выполните миграции `python manage.py migrate`.
 """
@@ -17,12 +17,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        if (Category.objects.exists()
-                or Genre.objects.exists()
-                or Title.objects.exists()
-                or Review.objects.exists()
-                or Comment.objects.exists()
-                or User.objects.exists()):
+        if (
+            Category.objects.exists()
+            or Genre.objects.exists()
+            or Title.objects.exists()
+            or Review.objects.exists()
+            or Comment.objects.exists()
+            or User.objects.exists()
+        ):
             print('в таблице Жанры уже содержатся данные.')
             print(ALREDY_LOADED_ERROR_MESSAGE)
             return
@@ -41,7 +43,7 @@ class Command(BaseCommand):
                         role=row['role'],
                         bio=row['bio'],
                         first_name=row['first_name'],
-                        last_name=row['last_name']
+                        last_name=row['last_name'],
                     )
                 )
             User.objects.bulk_create(data_list)
@@ -53,12 +55,7 @@ class Command(BaseCommand):
             reader = DictReader(file)
             self.stdout.write(f'Загрузка данных из {file_path}... ', ending='')
             for row in reader:
-                data_list.append(
-                    Category(
-                        name=row['name'],
-                        slug=row['slug']
-                    )
-                )
+                data_list.append(Category(name=row['name'], slug=row['slug']))
             Category.objects.bulk_create(data_list)
         self.stdout.write(self.style.SUCCESS("OK"))
 
@@ -68,12 +65,7 @@ class Command(BaseCommand):
             reader = DictReader(file)
             self.stdout.write(f'Загрузка данных из {file_path}... ', ending='')
             for row in reader:
-                data_list.append(
-                    Genre(
-                        name=row['name'],
-                        slug=row['slug']
-                    )
-                )
+                data_list.append(Genre(name=row['name'], slug=row['slug']))
             Genre.objects.bulk_create(data_list)
         self.stdout.write(self.style.SUCCESS("OK"))
 
@@ -87,7 +79,7 @@ class Command(BaseCommand):
                     Title(
                         name=row['name'],
                         year=row['year'],
-                        category_id=row['category']
+                        category_id=row['category'],
                     )
                 )
             Title.objects.bulk_create(data_list)
@@ -105,7 +97,7 @@ class Command(BaseCommand):
                         text=row['text'],
                         author_id=row['author'],
                         score=row['score'],
-                        pub_date=row['pub_date']
+                        pub_date=row['pub_date'],
                     )
                 )
             Review.objects.bulk_create(data_list)
@@ -141,23 +133,23 @@ class Command(BaseCommand):
 
 
 # ============================================================================
-        # file_path_list = {
-        #     User: 'static/data/users.csv',
-        #     Category: 'static/data/category.csv',
-        #     Genre: 'static/data/genre.csv',
-        #     Title: 'static/data/title.csv',
-        #     Review: 'static/data/review.csv',
-        #     Comment: 'static/data/comment.csv',
-        # }
-        #
-        # for model, file_path in file_path_list:
-        #     data_list = []
-        #     with open(file_path, mode="r", encoding="utf-8") as file:
-        #         reader = DictReader(file)
-        #
-        #         for row in reader:
-        #             data_list.append(
-        #                 model(kwargs=*row)
-        #             )
-        #         model.objects.bulk_create(data_list)
-        #     print(f"Загрузка данных из {model_dict[model]} завершена")
+# file_path_list = {
+#     User: 'static/data/users.csv',
+#     Category: 'static/data/category.csv',
+#     Genre: 'static/data/genre.csv',
+#     Title: 'static/data/title.csv',
+#     Review: 'static/data/review.csv',
+#     Comment: 'static/data/comment.csv',
+# }
+#
+# for model, file_path in file_path_list:
+#     data_list = []
+#     with open(file_path, mode="r", encoding="utf-8") as file:
+#         reader = DictReader(file)
+#
+#         for row in reader:
+#             data_list.append(
+#                 model(kwargs=*row)
+#             )
+#         model.objects.bulk_create(data_list)
+#     print(f"Загрузка данных из {model_dict[model]} завершена")

@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-
 from users.models import User
 
 
@@ -38,9 +37,8 @@ class Title(models.Model):
         'Описание произведения',
         max_length=250,
         default='нет описания',
-        blank=True
+        blank=True,
     )
-    rating = models.SmallIntegerField(default=0)
     category = models.ForeignKey(
         Category,
         verbose_name='категория',
@@ -65,15 +63,14 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-    text = models.TextField(
-        'Текст отзыва',
-        help_text='Введите текст отзыва'
-    )
+    text = models.TextField('Текст отзыва', help_text='Введите текст отзыва')
 
     score = models.IntegerField(
         validators=[
-            MinValueValidator(settings.MIN_SCORE),
-            MaxValueValidator(settings.MAX_SCORE)
+            MinValueValidator(settings.MIN_SCORE,
+                              message='Рейтинг ниже допустимого'),
+            MaxValueValidator(settings.MAX_SCORE,
+                              message='Рейтинг выше допустимого'),
         ],
     )
 
@@ -87,7 +84,7 @@ class Review(models.Model):
         verbose_name='Произведение',
         on_delete=models.CASCADE,
         related_name='reviews',
-        help_text='название произведения'
+        help_text='название произведения',
     )
     author = models.ForeignKey(
         User,
@@ -100,8 +97,7 @@ class Review(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'title'],
-                name='unique_review'
+                fields=['author', 'title'], name='unique_review'
             )
         ]
         verbose_name = 'Отзыв'
@@ -109,13 +105,12 @@ class Review(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.text[:settings.FIRST_SYMBOLS]
+        return self.text[: settings.FIRST_SYMBOLS]
 
 
 class Comment(models.Model):
     text = models.TextField(
-        verbose_name='Текст комментария',
-        help_text='Введите текст комментария'
+        verbose_name='Текст комментария', help_text='Введите текст комментария'
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата создания комментария',
@@ -143,4 +138,4 @@ class Comment(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.text[:settings.FIRST_SYMBOLS]
+        return self.text[: settings.FIRST_SYMBOLS]

@@ -4,14 +4,7 @@ from .models import Review, Title, Category, Genre, Comment
 
 
 class TitleAdmin(admin.ModelAdmin):
-    list_display = (
-        'pk',
-        'name',
-        'year',
-        'category',
-        'rating',
-        'description'
-    )
+    list_display = ('pk', 'name', 'year', 'category', 'description')
     search_fields = ('name', 'year')
     list_filter = ('category',)
     empty_value_display = '-пусто-'
@@ -26,8 +19,15 @@ class ReviewAdmin(admin.ModelAdmin):
         'score',
         'pub_date',
     )
-    search_fields = ('title', 'text', 'pub_date',)
-    list_filter = ('pub_date', 'score',)
+    search_fields = (
+        'title',
+        'text',
+        'pub_date',
+    )
+    list_filter = (
+        'pub_date',
+        'score',
+    )
     empty_value_display = '-пусто-'
 
 
@@ -37,8 +37,14 @@ class CategoryAdmin(admin.ModelAdmin):
         'name',
         'slug',
     )
-    search_fields = ('name', 'slug',)
-    list_filter = ('name', 'slug',)
+    search_fields = (
+        'name',
+        'slug',
+    )
+    list_filter = (
+        'name',
+        'slug',
+    )
     empty_value_display = '-пусто-'
 
 
@@ -48,8 +54,14 @@ class GenreAdmin(admin.ModelAdmin):
         'name',
         'slug',
     )
-    search_fields = ('name', 'slug',)
-    list_filter = ('name', 'slug',)
+    search_fields = (
+        'name',
+        'slug',
+    )
+    list_filter = (
+        'name',
+        'slug',
+    )
     empty_value_display = '-пусто-'
 
 
