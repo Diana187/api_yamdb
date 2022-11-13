@@ -1,6 +1,5 @@
+from django.conf import settings
 from rest_framework import permissions
-
-from users.models import ADMIN, MODERATOR
 
 
 class AnonReadOnly(permissions.BasePermission):
@@ -18,8 +17,8 @@ class AuthorOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.user.is_authenticated:
             return request.user == obj.author or request.user.role in (
-                ADMIN,
-                MODERATOR,
+                settings.ADMIN,
+                settings.MODERATOR,
             )
         return super().has_object_permission(request, view, obj)
 
@@ -33,7 +32,7 @@ class AdminOrReaOnly(permissions.BasePermission):
         return request.method in permissions.SAFE_METHODS or (
             request.user.is_authenticated
             and (
-                request.user.role == ADMIN
+                request.user.role == settings.ADMIN
                 or request.user.is_staff
                 or request.user.is_superuser
             )
@@ -55,7 +54,7 @@ class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
         return (
             request.method in permissions.SAFE_METHODS
             or obj.author == request.user
-            or request.user.role in (ADMIN,MODERATOR)
+            or request.user.role in (settings.ADMIN,settings.MODERATOR)
         )
 
 
@@ -67,6 +66,6 @@ class IsAdmin(permissions.IsAdminUser):
         user = request.user
         return (
             user.is_authenticated
-            and user.role == ADMIN
+            and user.role == settings.ADMIN
             or user.is_superuser
         )

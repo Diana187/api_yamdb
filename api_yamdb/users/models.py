@@ -2,8 +2,6 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from api_yamdb.settings import ADMIN, MODERATOR, USER
-
 
 class User(AbstractUser):
     bio = models.TextField(
@@ -35,12 +33,12 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == ADMIN
+        return self.role == settings.ADMIN
 
     @property
     def is_moderator(self):
-        return self.role == MODERATOR
+        return self.role == settings.MODERATOR
 
     @property
     def is_user(self):
-        return self.role == USER
+        return self.role == settings.USER
