@@ -56,9 +56,7 @@ class GenresViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    """
-    Получить список всех объектов. Права доступа: Доступно без токена
-    """
+    """Получить список всех объектов. Права доступа: Доступно без токена."""
 
     queryset = Title.objects.annotate(Avg('reviews__score'))
     permission_classes = (AdminOrReaOnly,)
