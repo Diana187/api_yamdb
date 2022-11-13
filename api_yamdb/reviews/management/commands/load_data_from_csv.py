@@ -6,7 +6,7 @@ from reviews.models import Category, Genre, Title, Review, Comment
 from users.models import User
 
 ALREDY_LOADED_ERROR_MESSAGE = """
-Перед загрузкой данных из CSV-файла, удалите файл БД db.sqlite3. 
+Перед загрузкой данных из CSV-файла, удалите файл БД db.sqlite3.
 Создайте миграции `python manage.py makemigrations`.
 Выполните миграции `python manage.py migrate`.
 """

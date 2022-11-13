@@ -11,8 +11,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.permissions import AnonReadOnly, IsAdmin
 from users.models import User
-from users.serializers import TokenSerializer, SignupSerializer, UserSerializer, \
-    ForUserSerializer
+from users.serializers import (TokenSerializer, SignupSerializer,
+                               UserSerializer, ForUserSerializer)
 
 
 class APITokenView(generics.CreateAPIView):
@@ -106,5 +106,3 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
