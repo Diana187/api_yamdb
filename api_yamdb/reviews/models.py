@@ -72,8 +72,10 @@ class Review(models.Model):
 
     score = models.IntegerField(
         validators=[
-            MinValueValidator(settings.MIN_SCORE),
-            MaxValueValidator(settings.MAX_SCORE),
+            MinValueValidator(settings.MIN_SCORE,
+                              message='Рейтинг ниже допустимого'),
+            MaxValueValidator(settings.MAX_SCORE,
+                              message='Рейтинг выше допустимого'),
         ],
     )
 

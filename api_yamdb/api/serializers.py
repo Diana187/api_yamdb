@@ -100,3 +100,14 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Title
+
+    def validate_year(self, value):
+        """
+        Нельзя добавлять произведения, которые еще не вышли
+        (год выпуска не может быть больше текущего)
+        """
+        if value > datetime.datetime.now().year:
+            raise serializers.ValidationError(
+                'Год выпуска не может быть больше текущего'
+            )
+        return value

@@ -25,6 +25,7 @@ from api.serializers import (
 )
 
 from reviews.models import Category, Review, Title, Genre
+from users.models import User, ADMIN, MODERATOR, USER
 
 
 class CreateListDestroyViewSet(
