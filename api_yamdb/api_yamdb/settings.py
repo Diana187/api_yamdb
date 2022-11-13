@@ -155,19 +155,6 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 }
 
-
-SCORE_CHOICES = [
-    ("1", 1),
-    ("2", 2),
-    ("3", 3),
-    ("4", 4),
-    ("5", 5),
-    ("6", 6),
-    ("7", 7),
-    ("8", 8),
-    ("9", 9),
-    ("10", 10),
-]
 MIN_SCORE = 1
 MAX_SCORE = 10
 USER_ROLE_CHOICES = [

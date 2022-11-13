@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from reviews.validators import year_validator
 from users.models import User
 
 
@@ -33,14 +34,16 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField('Наименование произведения', max_length=200)
-    year = models.IntegerField('Год создания произведения')
+    year = models.IntegerField(
+        'Год создания произведения',
+        validators=[year_validator]
+    )
     description = models.CharField(
         'Описание произведения',
         max_length=250,
         default='нет описания',
         blank=True,
     )
-    rating = models.SmallIntegerField(default=0)
     category = models.ForeignKey(
         Category,
         verbose_name='категория',

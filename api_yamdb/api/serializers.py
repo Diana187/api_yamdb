@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
 from reviews.models import Title, Category, Review, Comment, Genre
+from reviews.validators import year_validator
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -69,8 +70,9 @@ class TitleReadSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(read_only=True, many=True)
     rating = serializers.IntegerField(
-        source='reviews__score__avg', read_only=True
+        source='reviews__score__avg', read_only=True, default=0
     )
+    year = serializers.IntegerField(validators=[year_validator])
 
     class Meta:
         fields = (
@@ -98,14 +100,3 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Title
-
-    def validate_year(self, value):
-        """
-        Нельзя добавлять произведения, которые еще не вышли
-        (год выпуска не может быть больше текущего)
-        """
-        if value > datetime.datetime.now().year:
-            raise serializers.ValidationError(
-                'Год выпуска не может быть больше текущего'
-            )
-        return value

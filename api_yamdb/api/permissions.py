@@ -58,6 +58,9 @@ class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
 
 
 class IsAdmin(permissions.IsAdminUser):
+    """Разрешает доступ к списку или объекту только
+    вторизованным пользователям с ролью admin и суперюзерам."""
+
     def has_permission(self, request, view):
         user = request.user
         return (
