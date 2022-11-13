@@ -42,7 +42,7 @@ from api.serializers import (
 )
 
 from reviews.models import Category, Review, Title, Genre
-from users.models import User
+from users.models import User, ADMIN, MODERATOR , USER
 
 
 class CreateListDestroyViewSet(
@@ -122,12 +122,12 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = UserSerializer(instance=request.user)
             return Response(serializer.data, status=HTTP_200_OK)
 
-        if request.user.role in ('admin', 'superuser'):
+        if request.user.role in (ADMIN, 'superuser'):
             serializer = UserSerializer(
                 request.user, data=request.data, partial=True
             )
 
-        elif request.user.role in ('user', 'moderator'):
+        elif request.user.role in (USER, MODERATOR):
             serializer = ForUserSerializer(
                 request.user, data=request.data, partial=True
             )

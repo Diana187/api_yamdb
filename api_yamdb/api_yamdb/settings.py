@@ -1,3 +1,5 @@
+#settings
+
 import os
 from datetime import timedelta
 
@@ -149,8 +151,14 @@ SIMPLE_JWT = {
 
 MIN_SCORE = 1
 MAX_SCORE = 10
+
+USER = 'user'
+ADMIN = 'admin'
+MODERATOR = 'moderator'
+
+
 USER_ROLE_CHOICES = [
-    ('user', 'user'),
-    ('moderator', 'moderator'),
-    ('admin', 'admin'),
+    (USER, 'user'),
+    (MODERATOR, 'moderator'),
+    (ADMIN, 'admin'),
 ]
