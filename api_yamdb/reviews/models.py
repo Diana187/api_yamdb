@@ -1,8 +1,9 @@
+import datetime
+
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from reviews.validators import year_validator
 from users.models import User
 
 
@@ -36,7 +37,12 @@ class Title(models.Model):
     name = models.CharField('Наименование произведения', max_length=200)
     year = models.IntegerField(
         'Год создания произведения',
-        validators=[year_validator]
+        validators=[
+            MaxValueValidator(
+                datetime.datetime.now().year,
+                message='Годе не должен быть больше текущего'
+            )
+        ]
     )
     description = models.CharField(
         'Описание произведения',
