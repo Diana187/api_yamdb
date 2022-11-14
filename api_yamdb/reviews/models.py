@@ -77,6 +77,7 @@ class Review(models.Model):
     text = models.TextField('Текст отзыва', help_text='Введите текст отзыва')
 
     score = models.IntegerField(
+        help_text='Оценка от 1 до 10',
         validators=[
             MinValueValidator(settings.MIN_SCORE,
                               message='Рейтинг ниже допустимого'),
