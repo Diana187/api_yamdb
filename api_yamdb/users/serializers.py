@@ -19,7 +19,7 @@ class ValidateUsernameEmailMixin:
         return value
 
     def validate_username(self, value):
-        if value == 'me':
+        if value in ('me', 'Me'):
             raise ValidationError(
                 'Запрещено использовать "me" в качестве имени пользователя'
             )
