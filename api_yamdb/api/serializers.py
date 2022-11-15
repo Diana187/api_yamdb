@@ -1,6 +1,5 @@
-import datetime
-
 from django.core.validators import MaxValueValidator
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
@@ -73,12 +72,6 @@ class TitleReadSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(
         source='reviews__score__avg', read_only=True, default=0
     )
-    year = serializers.IntegerField(validators=[
-            MaxValueValidator(
-                datetime.datetime.now().year,
-                message='Годе не должен быть больше текущего'
-            )
-        ])
 
     class Meta:
         fields = (
@@ -102,18 +95,14 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(), slug_field='slug', many=True
     )
+    year = serializers.IntegerField(validators=[
+            MaxValueValidator(
+                timezone.now().year,
+                message='Годе не должен быть больше текущего'
+            )
+        ]
+    )
 
     class Meta:
         fields = '__all__'
         model = Title
-
-    def validate_year(self, value):
-        """
-        Нельзя добавлять произведения, которые еще не вышли
-        (год выпуска не может быть больше текущего)
-        """
-        if value > datetime.datetime.now().year:
-            raise serializers.ValidationError(
-                'Год выпуска не может быть больше текущего'
-            )
-        return value
