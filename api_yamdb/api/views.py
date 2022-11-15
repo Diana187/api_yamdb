@@ -1,11 +1,6 @@
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework.mixins import (
-    CreateModelMixin,
-    ListModelMixin,
-    DestroyModelMixin,
-)
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, viewsets
 
@@ -27,13 +22,7 @@ from api.serializers import (
 from reviews.models import Category, Review, Title, Genre
 
 
-class CreateListDestroyViewSet(
-    CreateModelMixin,
-    ListModelMixin,
-    DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    pass
+from api.mixins import CreateListDestroyViewSet
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
