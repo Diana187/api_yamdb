@@ -96,11 +96,11 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(), slug_field='slug', many=True
     )
     year = serializers.IntegerField(validators=[
-            MaxValueValidator(
-                timezone.now().year,
-                message='Годе не должен быть больше текущего'
-            )
-        ]
+        MaxValueValidator(
+            timezone.now().year,
+            message='Годе не должен быть больше текущего'
+        )
+    ]
     )
 
     class Meta:

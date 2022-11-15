@@ -130,26 +130,3 @@ class Command(BaseCommand):
 
                 title_obj.genre.add(genre)
         self.stdout.write(self.style.SUCCESS("OK"))
-
-
-# ============================================================================
-# file_path_list = {
-#     User: 'static/data/users.csv',
-#     Category: 'static/data/category.csv',
-#     Genre: 'static/data/genre.csv',
-#     Title: 'static/data/title.csv',
-#     Review: 'static/data/review.csv',
-#     Comment: 'static/data/comment.csv',
-# }
-#
-# for model, file_path in file_path_list:
-#     data_list = []
-#     with open(file_path, mode="r", encoding="utf-8") as file:
-#         reader = DictReader(file)
-#
-#         for row in reader:
-#             data_list.append(
-#                 model(kwargs=*row)
-#             )
-#         model.objects.bulk_create(data_list)
-#     print(f"Загрузка данных из {model_dict[model]} завершена")
