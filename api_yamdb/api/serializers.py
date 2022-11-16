@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.validators import MaxValueValidator
 from django.utils import timezone
 from rest_framework import serializers
@@ -95,12 +97,15 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(), slug_field='slug', many=True
     )
-    year = serializers.IntegerField(validators=[
-        MaxValueValidator(
-            timezone.now().year,
-            message='Годе не должен быть больше текущего'
-        )
-    ]
+
+    # Замечание про использование timezone непонятно, сделал так...
+    year = serializers.IntegerField(
+        validators=[
+            MaxValueValidator(
+                datetime.datetime.now(timezone.utc).year,
+                message='Годе не должен быть больше текущего'
+            )
+        ]
     )
 
     class Meta:
