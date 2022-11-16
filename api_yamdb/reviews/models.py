@@ -1,5 +1,3 @@
-import datetime
-
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -37,13 +35,12 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField('Наименование произведения', max_length=200)
 
-    # Замечание про использование timezone непонятно, сделал так...
     year = models.IntegerField(
         'Год создания произведения',
         validators=[
             MaxValueValidator(
-                datetime.datetime.now(timezone.utc).year,
-                message='Годе не должен быть больше текущего'
+                timezone.localtime(timezone.now()).year,
+                message='Год не должен быть больше текущего'
             )
         ]
     )
