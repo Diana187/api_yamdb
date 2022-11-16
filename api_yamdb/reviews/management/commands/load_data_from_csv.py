@@ -1,5 +1,6 @@
 from csv import DictReader
 
+from django.conf import settings
 from django.core.management import BaseCommand
 
 from reviews.models import Category, Genre, Title, Review, Comment
@@ -130,3 +131,20 @@ class Command(BaseCommand):
 
                 title_obj.genre.add(genre)
         self.stdout.write(self.style.SUCCESS("OK"))
+
+# ============================================================================
+#         file_path_list = {
+#             User: 'static/data/users.csv',
+#             Category: 'static/data/category.csv',
+#             Genre: 'static/data/genre.csv',
+#             Title: 'static/data/titles.csv',
+#             Review: 'static/data/review.csv',
+#             Comment: 'static/data/comment.csv',
+#         }
+#
+#         for model, file_path in file_path_list.items():
+#             with open(f'E:/ДОкументы/my_Python/api_yamdb/api_yamdb/{file_path}', mode="r", encoding="utf-8") as file:
+#                 reader = DictReader(file)
+#                 self.stdout.write(f"Загрузка данных из {file_path}... ", ending='')
+#                 model.objects.bulk_create(model(**data) for data in reader)
+#             self.stdout.write(self.style.SUCCESS("OK"))
