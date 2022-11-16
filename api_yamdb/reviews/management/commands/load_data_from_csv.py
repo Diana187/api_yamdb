@@ -142,7 +142,8 @@ class Command(BaseCommand):
 #         }
 #
 #         for model, file_path in file_path_list.items():
-#             with open(f'E:/ДОкументы/my_Python/api_yamdb/api_yamdb/{file_path}',
+#             with open(
+#                 f'E:/ДОкументы/my_Python/api_yamdb/api_yamdb/{file_path}',
 #                 mode="r", encoding="utf-8"
 #             ) as file:
 #                 reader = DictReader(file)
