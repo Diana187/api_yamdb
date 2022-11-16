@@ -142,8 +142,13 @@ class Command(BaseCommand):
 #         }
 #
 #         for model, file_path in file_path_list.items():
-#             with open(f'E:/ДОкументы/my_Python/api_yamdb/api_yamdb/{file_path}', mode="r", encoding="utf-8") as file:
+#             with open(f'E:/ДОкументы/my_Python/api_yamdb/api_yamdb/{file_path}',
+#                 mode="r", encoding="utf-8"
+#             ) as file:
 #                 reader = DictReader(file)
-#                 self.stdout.write(f"Загрузка данных из {file_path}... ", ending='')
+#                 self.stdout.write(
+#                     f"Загрузка данных из {file_path}... ",
+#                     ending=''
+#                 )
 #                 model.objects.bulk_create(model(**data) for data in reader)
 #             self.stdout.write(self.style.SUCCESS("OK"))
