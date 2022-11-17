@@ -1,10 +1,8 @@
-from django.core.validators import MaxValueValidator
-from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from reviews.models import Title, Category, Review, Comment, Genre
-
+from reviews.models import Genre, Title, Review, Comment, Category
+from reviews.validators import year_validator
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериалайзер для модели Category."""
@@ -97,12 +95,7 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     )
 
     year = serializers.IntegerField(
-        validators=[
-            MaxValueValidator(
-                timezone.localtime(timezone.now()).year,
-                message='Год не должен быть больше текущего'
-            )
-        ]
+        validators=[year_validator]
     )
 
     class Meta:
