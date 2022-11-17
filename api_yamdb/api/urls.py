@@ -1,13 +1,13 @@
-from django.urls import include, path
+from django.urls import path, include
 from rest_framework import routers
 
-from users.views import UserViewSet, APISignupView, APITokenView
+from users.views import UserViewSet, APITokenView, APISignupView
 from .views import (
-    CategoryViewSet,
     TitleViewSet,
     GenresViewSet,
     ReviewViewSet,
     CommentViewSet,
+    CategoryViewSet,
 )
 
 router = routers.SimpleRouter()
