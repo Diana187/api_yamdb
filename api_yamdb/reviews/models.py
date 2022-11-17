@@ -1,9 +1,9 @@
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from reviews.validators import year_validator
 from users.models import User
+from reviews.validators import year_validator
 
 
 class Category(models.Model):

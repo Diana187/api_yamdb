@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from reviews.models import Genre, Title, Review, Comment, Category
+from reviews.models import Category, Comment, Genre, Review, Title
 from reviews.validators import year_validator
+
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериалайзер для модели Category."""

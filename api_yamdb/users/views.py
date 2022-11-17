@@ -1,7 +1,7 @@
 import uuid
 
 from django.core.mail import EmailMessage
-from rest_framework import generics, status, viewsets, filters
+from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
