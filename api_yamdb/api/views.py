@@ -5,7 +5,6 @@ from rest_framework import filters, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
 from api.filters import FilterForTitle
-from api.mixins import CreateListDestroyViewSet
 from api.permissions import AdminModeratorAuthorOrReadOnly, AdminOrReaOnly
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, ReviewSerializer,
